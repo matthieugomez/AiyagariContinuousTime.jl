@@ -1,0 +1,141 @@
+%% LyX 2.1.4 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{esint}
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+\makeatother
+\usepackage{babel}
+\begin{document}
+
+\section{derivation}
+\begin{itemize}
+	\item 
+	HMJ is
+	$$0 = \rho \theta V_t(\frac{C_t^{(1-\gamma)\theta}}{((1-\gamma)V_t)^{\frac{1}{\theta}}}-1) + \frac{E[dV_t]}{dt}$$
+	We know $V_t$ is homogeneous in  $C_t$
+	$$V_t = \frac{C_t^{1-\gamma}}{1-\gamma} G_t$$
+	Substituting in HMJ, we obtain
+	$$0 = \frac{\rho\theta}{1-\gamma}C_t^{1-\gamma}G_t(G_t^{-\frac{1}{\theta}}-1) + \frac{C_t^{1-\gamma}}{1-\gamma}E\frac{dG_t}{dt} +  \frac{G_t}{1-\gamma}E\frac{dC_t^{1-\gamma}}{dt}$$
+	Using Ito, 
+	\begin{align*}
+		E[\frac{dC_{t}^{1-\gamma}}{C_{t}^{1-\gamma}}]=\left[(1-\gamma)\mu_{Ct}-\frac{1}{2}(1-\gamma)\gamma\sigma^{2}_{Ct}\right]dt
+	\end{align*}
+	We obtain 
+	$$0 = \rho \theta (G_t^{1-\frac{1}{\theta}}-G_t) + E\frac{dG_t}{dt} + G_t ((1-\gamma) \mu_{Ct} - \frac{1}{2}(1-\gamma)\gamma\sigma_{Ct}^2)$$
+\end{itemize}
+
+\section{Bansal Yaron}
+
+\begin{align*}
+	\frac{dC_{t}}{C_{t}} & =  \mu_{t}dt+\nu_{D}\sqrt{\sigma_{t}}dZ_{t}\\
+	d\mu_{t} & =  \kappa_{\mu}(\bar{\mu}-\mu_{t})dt+\nu_{\mu}\sqrt{\sigma_{t}}dZ_{t}^{\mu}\\
+	d\sigma_{t} & =  \kappa_{\sigma}(1-\sigma_{t})dt+\nu_{\sigma}\sqrt{\sigma_{t}}dZ_{t}^{\sigma}
+\end{align*}
+
+\begin{tabular}{|c|c|c|c|c|c|}
+	\hline 
+	Name & BY04 & BY04 & This paper & This paper & Link
+	\tabularnewline
+	\hline 
+	\hline 
+	mean growth rate & $\mu$ & 0.0015 & $\bar{\mu}$ & 0.0015 & $\mu=\bar{\mu}$
+	\tabularnewline
+	\hline 
+	mean volatility & $\sigma^{2}$ & 0.00006084 & $\nu_{D}$ & 0.0078 & $\sqrt{\sigma^{2}}=\nu_{D}$
+	\tabularnewline
+	\hline 
+	growth persistence & $\rho$ & 0.979 & $\kappa_{\mu}$ & 0.0212 &  - \log(\rho) = \kappa_\mu 
+	
+	\tabularnewline
+	\hline 
+	volatility persistence & $\nu_{1}$ & 0.987 & $\kappa_{\sigma}$ & 0.0131 & $-\log\left(\nu_{1}\right)=\kappa_{\sigma}$
+	\tabularnewline
+	\hline 
+	growth rate volatility & $\varphi_{e}$ & 0.044 & $\nu_{\mu}$ & 0.0003432 & $\varphi_{e}\times\sqrt{\sigma^{2}}=\nu_{\mu}$
+	\tabularnewline
+	\hline 
+	volatility volatility & $\sigma_{w}$ & 0.0000023 & $\nu_{\sigma}$ & 0.0378 & $\sigma_{w}/\sigma^{2}=\nu_{\sigma}$
+	\tabularnewline
+	\hline 
+	time discount & $\delta$ & 0.998 & $\rho$ & 0.002 & $-\log\left(\delta\right)=\rho$
+	\tabularnewline
+	\hline 
+	RRA & $1-\gamma$(RRA) & 7.5 or 10 & $1-\gamma$ & -6.5 or -9 & $1-\text{RRA}=1-\gamma$
+	\tabularnewline
+	\hline 
+	IES & $\psi$ & 1.5 & $\psi$ & 1.5 & \psi = \psi
+	\tabularnewline
+	\hline
+\end{tabular}
+This also means $\theta = (1-\gamma)/(1- 1/\psi)$ = -19.50 or -27.
+
+
+We write $G_t = G(\mu, \sigma)$ and we get
+\begin{align*}
+	0&= \rho \theta[G^{1-\frac{1}{\theta}}- G]+G((1-\gamma)\mu-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma)\\
+	&+\kappa_{\mu}(\bar{\mu}-\mu)\frac{\partial G}{\partial\mu}+\kappa_{\sigma}(1-\sigma)\frac{\partial G}{\partial\sigma}\\
+	&+\frac{1}{2}\nu_{\mu}^{2}\sigma\frac{\partial^{2}G}{\partial\mu^{2}}+\frac{1}{2}\nu_{\sigma}^{2}\sigma \frac{\partial^{2}G}{\partial\sigma^{2}}
+\end{align*}
+
+Boundary coundition  = reflectiving barrier
+\begin{align*}
+	\partial_\mu G(\underline{u}, \sigma) &= 0  \\
+	\partial_\mu G(\overline{u}, \sigma) &= 0 \\
+	\partial_\sigma G(u, \underline{\sigma}) &= 0  \\
+	\partial_\sigma G(u, \overline{\sigma}) &= 0 
+\end{align*}
+
+
+Finite difference
+
+\begin{align*}
+	\frac{G^{n+1}_{i, j} - G^n_{i, j}}{\Delta}&= \rho \theta[(G_{ij}^{n})^{1-\frac{1}{\theta}}- G_{ij}^{{n+1}}]+G_{ij}^{n+1}((1-\gamma)\mu_i-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
+	&+\kappa_{\mu_i}(\bar{\mu}-\mu_i)^+(G_{i+1, j}^{n+1}-G_{i, j}^{n+1}) +\kappa_{\mu_i}(\bar{\mu}-\mu_i)^-(G_{i, j}^{n+1}-G_{i-1, j}^{n+1})\\
+	&+\kappa_{\sigma_j}(1-\sigma_j)^+(G_{i, j+1}^{n+1}-G_{i,j}^{n+1}) +\kappa_{\sigma_j}(1-\sigma_j)^-(G_{i, j}^{n+1}-G_{i,j-1}^{n+1})\\
+	&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j(G_{i+1, j}^{n+1} - 2 G_{i, j}^{n+1} + G_{i-1, j}^{n+1})+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j(G_{i, j+1}^{n+1} - 2 G_{i, j}^{n+1} + G_{i, j-1}^{n+1})
+\end{align*}
+
+The monotinicity condition in $G^{n+1}_{i+1, j}, G^{n+1}_{i-1, j}, G^{n+1}_{i, j+1}, G^{n+1}_{i, j-1}$ is always satisfied.  The monotonicity condition in  $G^n_{i, j}$ is not necessarly satisfied when $\theta <1$ since then $\rho\theta (G^n_{ij})^{1-1/\theta}$ is decreasing in $G^n_{i, j} \Rightarrow$.  
+There are two solutions
+\begin{itemize}
+	\item Substitute $G_{ij}^{n+1}$ by $G_{ij}^{n}$ in some terms increasing in $G_{ij}^n$. This does not work for all possible parameter values. Scheme implemented by the type BansalYaronL. 
+	\begin{align*}
+		\frac{G^{n+1}_{i, j} - G^n_{i, j}}{\Delta}&= \rho \theta(G_{ij}^{n})^{1-\frac{1}{\theta}}\\ 
+		&- (\rho \theta)^-  G_{ij}^{{n}} -(\rho \theta)^+ G_{ij}^{{n+1}}\\
+		&+ ((1-\gamma)\mu_i -\frac{1}{2}(1-\gamma)\gamma\nu_D^2)) G_{ij}^{{n}} \\
+		&+\kappa_{\mu_i}(\bar{\mu}-\mu_i)^+(G_{i+1, j}^{n+1}-G_{i, j}^{n+1}) +\kappa_{\mu_i}(\bar{\mu}-\mu_i)^-(G_{i, j}^{n+1}-G_{i-1, j}^{n+1})\\
+		&+\kappa_{\sigma_j}(1-\sigma_j)^+(G_{i, j+1}^{n+1}-G_{i,j}^{n+1}) +\kappa_{\sigma_j}(1-\sigma_j)^-(G_{i, j}^{n+1}-G_{i,j-1}^{n+1})\\
+		&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j(G_{i+1, j}^{n+1} - 2 G_{i, j}^{n+1} + G_{i-1, j}^{n+1})+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j(G_{i, j+1}^{n+1} - 2 G_{i, j}^{n+1} + G_{i, j-1}^{n+1})
+	\end{align*}
+	Actually, one can always choose $\Delta$ low enough that the scheme is increasing in $G^n_{ij}$ (since $G$ is bounded on the state space). But then this introduces rounding errors.
+	\item Substitute $G_{ij}^n$ by $G_{ij}^{n+1}$ in  $\rho\theta (G^n_{ij})^{1-1/\theta}$. Then one needs to solve a non-iterative non-linear equation instead of a iterative linear one. It's not really slower. Scheme implemented by the type BansalYaronNL.
+	\begin{align*}
+		0&= \rho \theta[(G_{ij}^{n+1})^{1-\frac{1}{\theta}}- G_{ij}^{{n+1}}]+G_{ij}^{n+1}((1-\gamma)\mu_i-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
+		&+\kappa_{\mu_i}(\bar{\mu}-\mu_i)^+(G_{i+1, j}^{n+1}-G_{i, j}^{n+1}) +\kappa_{\mu_i}(\bar{\mu}-\mu_i)^-(G_{i, j}^{n+1}-G_{i-1, j}^{n+1})\\
+		&+\kappa_{\sigma_j}(1-\sigma_j)^+(G_{i, j+1}^{n+1}-G_{i,j}^{n+1}) +\kappa_{\sigma_j}(1-\sigma_j)^-(G_{i, j}^{n+1}-G_{i,j-1}^{n+1})\\
+		&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j(G_{i+1, j}^{n+1} - 2 G_{i, j}^{n+1} + G_{i-1, j}^{n+1})+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j(G_{i, j+1}^{n+1} - 2 G_{i, j}^{n+1} + G_{i, j-1}^{n+1})
+	\end{align*}
+\end{itemize}
+
+\section{Comparaison}
+Denote $k_t$ the consumption to wealth ratio
+$$V = G_tk_t^{1-\gamma}\frac{W^{1-\gamma}}{(1-\gamma)}$$
+FOC for consumption 
+$$k_t = \rho^{\psi} k_t^{1-\psi}G_t^\frac{1-\psi}{1-\gamma}$$
+therefore
+$$ k_t = \rho G_t^{-1/\theta}$$
+Bansal Yaron find
+\begin{align*}
+	\frac{1}{\theta}\log G_t-\log \rho &\approx A_1 \mu_t + A_2 \nu_D^2\sigma_t\\
+	A1 &= \frac{1-\frac{1}{\psi}}{1-0.997 e^{-\kappa_\mu}}\\
+	A2 &= 0.5\theta\frac{(1 - \frac{1}{\psi})^2 + (A_1  \kappa_1  \frac{\nu_\mu}{\nu_D^2})^2}{1-0.997e^{-\kappa_\sigma}}
+\end{align*}
+\end{document}
