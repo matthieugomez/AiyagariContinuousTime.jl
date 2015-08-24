@@ -1,34 +1,28 @@
 abstract BansalYaronProblem
 
 
-function solve_hmj!(byp::BansalYaronProblem ;  
+function solve!(byp::BansalYaronProblem ;  
 					maxit::Int = 1000000, 
 					crit::Float64 = 1e-6, 
 					verbose::Bool = true,
 					args...)
-	if byp.invΔ == 0
+
+	for iter in 1:maxit
+		@show iter
 		@show mean(byp.V)
+		# update newV
 		update_value!(byp; args...)
-		copy!(byp.V, byp.newV)
-		@show mean(byp.V)
-	else
-		for iter in 1:maxit
-			@show iter
-			@show mean(byp.V)
-			# update newV
-			update_value!(byp; args...)
-			# check convergence
-			distance = chebyshev(vec(byp.newV, vec(byp.V))
-			@show distance
-			if distance < crit
-				if verbose
-					println("hmj solved : $(iter) iterations")
-				end
-				break
-			else
-				# update V using newV
-				(byp.newV, byp.V) = (byp.V, byp.newV)
+		# check convergence
+		distance = chebyshev(vec(byp.newV), vec(byp.V))
+		@show distance
+		if distance < crit
+			if verbose
+				println("hmj solved : $(iter) iterations")
 			end
+			break
+		else
+			# update V using newV
+			(byp.newV, byp.V) = (byp.V, byp.newV)
 		end
 	end
 end

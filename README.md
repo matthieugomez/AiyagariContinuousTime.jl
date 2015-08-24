@@ -1,89 +1,56 @@
-This repository solves some economic models via PDE.
-
+# Install
+```julia
+Pkg.clone("https://github.com/matthieugomez/HJBviaPDE.jl")
+```
 
 # Aiyagari
-Following Achdou, Han, Lasry, Lions and Moll (2014)
+Following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
 
 ```julia
-# solve a static problem
+# solve a static equilibrium
+using HJBviaPDE, Gadfly
 π = 1.0
 K = 3.8
 ap = AiyagariProblem(π, K);
-@time solve!(ap)
+solve!(ap)
 
-
-# solve a dynamic problem
-N = 400 ;
-dt = 0.5 ; 
-ν = 1-0.8 ;
-π = Array(Float64, N) ;
-π[1]=.97
-for t=1:(N-1)
-    π[t+1] = dt * ν * (1 - π[t]) + π[t]
+# solve a dynamic equilibrium
+## construct an unexpected productivity shock π
+dt = 0.5
+π = Array(Float64, 400);
+π[1] = 0.97
+for t in 2:length(π)
+    π[t] = 0.5 * 0.2 * (1.0 - π[t-1]) + π[t-1]
 end
+## solve along this shock
 K = 3.8
-
-# initializing computes K(t) stationary solution for π[t]
 apd = DynamicAiyagariProblem(π, K, dt = dt);
 solve!(apd)
-#
-## plot capital evolution
-## install the package Gadfly with Pkg.add("Gadfly")
-#using Gadfly
-#plot(x = collect(1:N), y = apd.K, Geom.line)
+plot(x = collect(1:length(π)), y = apd.K, Geom.line)
 ```
+
+![aiyagari](https://cdn.rawgit.com/matthieugomez/HJBviaPDE.jl/master/img/aiyagari.svg)
+
 
 # Bansal Yaron
 
+Parameters from Bansal Yaron Kiku (2007)
 
 ```julia
-#
-# Bansal Yaron (2004)
-#
+using HJBviaPDE, Gadfly
 
-# linear scheme (runs in 0.06s)
-byp = BansalYaronProblemL(γ = 7.5, ψ = 1.5)
-@time solve_hmj!(byp)
+# NL scheme solved using Newton method
+byp = BansalYaronProblemNewton(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
+@time solve!(byp)
 plot(byp, :s2)
 plot(byp, :m)
 
-# non linear scheme (runs in 0.6s)
-byp = BansalYaronProblemNL(γ = 7.5, ψ = 1.5)
-@time solve_hmj!(byp, method = :newton)
-plot(byp, :s2)
-plot(byp, :m)
-
-
-#
-# Bansal Yaron Kiku (2007)
-#
-
-# linear scheme (runs in 0.24s)
-byp =BansalYaronProblemL(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
-@time solve_hmj!(byp)
-plot(byp, :s2)
-plot(byp, :m)
-
-# non linear scheme (runs in 0.4s)
-byp =BansalYaronProblemNL(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
-@time solve_hmj!(byp)
-plot(byp, :s2)
-plot(byp, :m)
-
-
-
-
-# linear scheme (runs in 0.24s)
-byp =BansalYaronProblemL(ρ = -log(0.9989), γ = 50, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
-@time solve_hmj!(byp)
-plot(byp, :s2)
-plot(byp, :m)
-
-# non linear scheme (runs in 0.4s)
-byp =BansalYaronProblemNL(ρ = -log(0.9989), γ = 50, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
-@time solve_hmj!(byp)
+# NL scheme solved using Powell Dog-leg method
+byp = BansalYaronProblemPowell(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
+@time solve!(byp)
 plot(byp, :s2)
 plot(byp, :m)
 ```
 
+![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBviaPDE.jl/master/img/bansalyaron.svg)
 
