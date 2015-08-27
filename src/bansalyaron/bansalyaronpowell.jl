@@ -66,7 +66,7 @@ function BansalYaronProblemPowell(;μ = 0.0015, νD = 0.0078, κμ = 0.0212, κ�
         (ones(μn*σn), ones(μn*σn-1), ones(μn*σn-1), ones((σn-1)*μn), ones((σn-1)*μn)),
         (0, 1, -1, μn, - μn)
     )
-    fill!(Cvals, zero(Float64))
+    fill!(nonzeros(C), zero(Float64))
 
     # set up C
     Crows = rowvals(C) 
@@ -108,15 +108,13 @@ function BansalYaronProblemPowell(;μ = 0.0015, νD = 0.0078, κμ = 0.0212, κ�
             Cvals[krange[index]] -= current
         end
         
-        current = (ρ * θ 
-                    - (1-γ) * μs[μi]
-                    + 0.5 * (1-γ) * γ * νD^2 * σs[σi]
-                    )
+        current = ρ * θ - (1-γ) * μs[μi] + 0.5 * (1-γ) * γ * νD^2 * σs[σi]
         index = searchsortedfirst(rows, ij)
         Cvals[krange[index]] += current
     end
     Ct = C'
     B = deepcopy(Ct)
+
     # initialize value at stationary value
     V = Array(Float64, μn * σn)
     fill!(V, (-1/(θ*ρ) * (μ * (1-γ) - 0.5 * (1-γ) * γ * νD^2 * 1.0) + 1.0)^(-1/(1-1/θ)))
@@ -133,17 +131,16 @@ end
 
 
 function f!(byp::BansalYaronProblemPowell, x::Vector{Float64}, out::Vector{Float64})
-    ij = zero(Int)
     μn = length(byp.μs)
     σn = length(byp.σs)
+
     Cvals = nonzeros(byp.C)
     Crows = rowvals(byp.C)
+    ij = zero(Int)
     @inbounds for σi in 1:σn, μi in 1:μn
         ij += 1
-        krange = nzrange(byp.C, ij)
-        rows = Crows[krange]
         current = zero(Float64)
-        for k in krange
+        for k in nzrange(byp.C, ij)
             current += Cvals[k] * x[Crows[k]]
         end
         current += - byp.ρ * byp.θ * max(x[ij], 0.0)^(1-1/byp.θ)
@@ -153,20 +150,21 @@ end
 
 
 function g!(byp::BansalYaronProblemPowell, x::Vector{Float64}, out::Base.SparseMatrix.SparseMatrixCSC{Float64, Int})
-    ij = zero(Int)
     μn = length(byp.μs)
     σn = length(byp.σs)
-    copy!(nonzeros(byp.B), nonzeros(byp.Ct))
+    
+    Ctvals = nonzeros(byp.Ct)
     Bvals = nonzeros(byp.B)
     Brows = rowvals(byp.B)
     ij = zero(Int)
     @inbounds for σi in 1:σn, μi in 1:μn
         ij += 1
-        krange = nzrange(byp.B, ij)
-        rows = Brows[krange]
-        current = - byp.ρ * byp.θ * (1-1/byp.θ) * max(x[ij], 0.0)^(-1/byp.θ)
-        index = searchsortedfirst(rows, ij)
-        Bvals[krange[index]] += current
+        for k in nzrange(byp.B, ij)
+            Bvals[k] = Ctvals[k]
+            if Brows[k] == ij
+                Bvals[k] += - byp.ρ * byp.θ * (1-1/byp.θ) * max(x[ij], 0.0)^(-1/byp.θ)
+            end
+        end
     end
     out.colptr = byp.B.colptr
     out.rowval = byp.B.rowval

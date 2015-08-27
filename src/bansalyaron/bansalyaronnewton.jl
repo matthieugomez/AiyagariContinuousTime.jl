@@ -110,7 +110,8 @@ function BansalYaronProblemNewton(;μ = 0.0015, νD = 0.0078, κμ = 0.0212, κ�
         Cvals[krange[index]] += current
     end
     B = deepcopy(C)
-    # initialize value at stationary value
+
+    # initialize V at stationary value
     V = Array(Float64, μn * σn)
     fill!(V, (-1/(θ*ρ) * (μ * (1-γ) - 0.5 * (1-γ) * γ * νD^2 * 1.0) + 1.0)^(-1/(1-1/θ)))
     newV = deepcopy(V)
@@ -129,18 +130,18 @@ function update_value!(byp::BansalYaronProblemNewton)
     σn = length(byp.σs)
 
     # update B
-    copy!(nonzeros(byp.B), nonzeros(byp.C))
     Brows = rowvals(byp.B)
     Bvals = nonzeros(byp.B)
+    Cvals = nonzeros(byp.C)
     ij = zero(Int)
     @inbounds for σi in 1:σn, μi in 1:μn
         ij += 1
-        krange = nzrange(byp.B, ij)
-        rows = Brows[krange]
-        # so that sum of C by column equal zero
-        current = - byp.ρ * (byp.θ-1) * byp.V[ij]^(-1/byp.θ)
-        index = searchsortedfirst(rows, ij)
-        Bvals[krange[index]] += current
+        for k in nzrange(byp.B, ij)
+            Bvals[k] = Cvals[k]
+            if Brows[k] == ij
+                Bvals[k] += - byp.ρ * (byp.θ-1) * byp.V[ij]^(-1/byp.θ)        
+            end
+        end
     end
 
 
