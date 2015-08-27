@@ -59,56 +59,57 @@ function BansalYaronProblemNewton(;μ = 0.0015, νD = 0.0078, κμ = 0.0212, κ�
     invdσ = (σn - 1)/(σmax - σmin)
 
     # create sparse matrix of the right form finite difference matrix B 
-    C = spdiagm(
+    Ct = spdiagm(
         (ones(μn*σn), ones(μn*σn-1), ones(μn*σn-1), ones((σn-1)*μn), ones((σn-1)*μn)),
         (0, 1, -1, μn, - μn)
     )
-    Cvals = nonzeros(C) 
-    fill!(Cvals, zero(Float64))
+    Ctvals = nonzeros(Ct) 
+    fill!(Ctvals, zero(Float64))
 
-    # set C such that C'v^n+1 = u^n
-    Crows = rowvals(C) 
+    # set Ct such that Ct'v^n+1 = u^n
+    Ctrows = rowvals(Ct) 
     ij = zero(Int)
     @inbounds for σi in 1:σn, μi in 1:μn
         ij += 1
-        krange = nzrange(C, ij)
-        rows = Crows[krange]
+        krange = nzrange(Ct, ij)
+        rows = Ctrows[krange]
         current =  min(κμ * (μ - μs[μi]) * invdμ, 0.0) - 0.5 * νμ^2 * σs[σi] * invdμ^2
         if μi > 1
             index = searchsortedfirst(rows, ij - 1)
-            Cvals[krange[index]] += current
+            Ctvals[krange[index]] += current
             index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            Ctvals[krange[index]] -= current
         end
 
         current =  - max(κμ * (μ - μs[μi]) * invdμ, 0.0) - 0.5 * νμ^2 * σs[σi] * invdμ^2
         if μi < μn
             index = searchsortedfirst(rows, ij + 1)
-            Cvals[krange[index]] += current
+            Ctvals[krange[index]] += current
             index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            Ctvals[krange[index]] -= current
         end
 
         current = min(κσ * (1.0 - σs[σi]) * invdσ, 0.0) - 0.5 * νσ^2 * σs[σi] * invdσ^2
         if σi > 1
             index = searchsortedfirst(rows, ij - μn)
-            Cvals[krange[index]] += current
+            Ctvals[krange[index]] += current
             index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            Ctvals[krange[index]] -= current
         end
 
         current = - max(κσ * (1.0 - σs[σi]) * invdσ, 0.0) - 0.5 * νσ^2 * σs[σi] * invdσ^2
         if σi < σn
             index = searchsortedfirst(rows, ij + μn)
-            Cvals[krange[index]] += current
+            Ctvals[krange[index]] += current
             index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            Ctvals[krange[index]] -= current
         end
         
         current = ρ * θ - (1-γ) * μs[μi] + 0.5 * (1-γ) * γ * νD^2 * σs[σi]
         index = searchsortedfirst(rows, ij)
-        Cvals[krange[index]] += current
+        Ctvals[krange[index]] += current
     end
+    C = Ct'
     B = deepcopy(C)
 
     # initialize V at stationary value
@@ -144,7 +145,6 @@ function update_value!(byp::BansalYaronProblemNewton)
         end
     end
 
-
     # update U
     ij = zero(Int)
     @inbounds for σi in 1:σn, μi in 1:μn
@@ -153,7 +153,7 @@ function update_value!(byp::BansalYaronProblemNewton)
     end
 
     # solve for new V
-    byp.newV = byp.B' \ byp.u
+    byp.newV = byp.B \ byp.u
 end
 
 
