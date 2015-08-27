@@ -20,15 +20,11 @@ type BansalYaronProblemNewton <: BansalYaronProblem
     ψ::Float64
     θ::Float64
 
-    # algorithm parameters
-    invdμ::Float64
-    invdσ::Float64 
-
-    # grid    
+    # state grid    
     μs::Vector{Float64}
     σs::Vector{Float64}
 
-    # storage array
+    # arrays for storage
     C::Base.SparseMatrix.SparseMatrixCSC{Float64, Int}
     B::Base.SparseMatrix.SparseMatrixCSC{Float64, Int}
     V::Vector{Float64}
@@ -119,7 +115,7 @@ function BansalYaronProblemNewton(;μ = 0.0015, νD = 0.0078, κμ = 0.0212, κ�
     fill!(V, (-1/(θ*ρ) * (μ * (1-γ) - 0.5 * (1-γ) * γ * νD^2 * 1.0) + 1.0)^(-1/(1-1/θ)))
     newV = deepcopy(V)
     u = fill(zero(Float64), μn*σn)
-    BansalYaronProblemNewton(μ, νD, κμ , κσ , νμ , νσ, ρ, γ, ψ, θ, invdμ, invdσ, μs, σs, C, B, V, newV, u)
+    BansalYaronProblemNewton(μ, νD, κμ , κσ , νμ , νσ, ρ, γ, ψ, θ, μs, σs, C, B, V, newV, u)
 end
 
 ##############################################################################
