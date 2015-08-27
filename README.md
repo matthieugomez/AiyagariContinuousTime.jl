@@ -12,7 +12,7 @@ using HJBviaPDE, Gadfly
 π = 1.0
 K = 3.8
 ap = AiyagariProblem(π, K);
-solve!(ap)
+@time solve!(ap)
 
 # solve a dynamic equilibrium
 ## construct an unexpected productivity shock π
@@ -25,7 +25,7 @@ end
 ## solve along this shock
 K = 3.8
 apd = DynamicAiyagariProblem(π, K, dt = dt);
-solve!(apd)
+@time solve!(apd)
 plot(x = collect(1:length(π)), y = apd.K, Geom.line)
 ```
 

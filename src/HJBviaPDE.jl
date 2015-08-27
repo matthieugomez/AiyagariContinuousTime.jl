@@ -13,12 +13,11 @@ import Distances: chebyshev
 ##
 ##############################################################################
 export solve!,
+AiyagariProblem,
+DynamicAiyagariProblem,
 BansalYaronProblem,
 BansalYaronProblemNewton,
-BansalYaronProblemPowell,
-AiyagariProblem,
-DynamicAiyagariProblem
-
+BansalYaronProblemPowell
 
 ##############################################################################
 ##
