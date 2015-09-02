@@ -56,6 +56,6 @@ plot(byp, :m)
 
 
 # Bibliography
-Below are two excellent resources about finite difference schemes and their applications to HJB equations:
+Two excellent resources to learn about finite difference schemes and their applications to HJB equations:
 - [Numerical analysis of partial differential equations arising in finance and stochastic control](http://www.cmap.polytechnique.fr/%7Ebonnans/notes/edpfin/edpfin.html) by Frédéric Bonnans.
 -  [Heterogeneous Agent Models in Continuous Time](http://www.princeton.edu/~moll/HACTproject.htm) by Ben Moll.
