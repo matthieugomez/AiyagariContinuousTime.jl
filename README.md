@@ -57,5 +57,5 @@ plot(byp, :m)
 
 # Bibliography
 Good resources on finite difference scheme to solve HJB numerically:
-- *Numerical analysis of partial differential equations arising in finance and stochastic control* by Frédéric Bonnans. [Part1](http://www.cmap.polytechnique.fr/~bonnans/notes/edpfin/edpfin.html) and [Part2](http://www.cmap.polytechnique.fr/~bonnans/notes/edpfin/edpfinFVEL-dec2014.pdf) of the course.
-- Ben Moll's webpage on [Heterogeneous Agent Models in Continuous Time](http://www.princeton.edu/~moll/HACTproject.htm)
+- [Numerical analysis of partial differential equations arising in finance and stochastic control](http://www.cmap.polytechnique.fr/%7Ebonnans/notes/edpfin/edpfin.html) by Frédéric Bonnans.
+-  [Heterogeneous Agent Models in Continuous Time](http://www.princeton.edu/~moll/HACTproject.htm) by Ben Moll.
