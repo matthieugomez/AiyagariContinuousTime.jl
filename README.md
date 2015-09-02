@@ -54,3 +54,8 @@ plot(byp, :m)
 
 ![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBviaPDE.jl/master/img/bansalyaron.svg)
 
+
+# Bibliography
+Two excellent resources on finite difference scheme to solve HJB numerically:
+- Course on "Numerical analysis of partial differential equations arising in finance and stochastic control" by Frédéric Bonnans. [Part1](http://www.cmap.polytechnique.fr/~bonnans/notes/edpfin/edpfin.html) and [Part2](http://www.cmap.polytechnique.fr/~bonnans/notes/edpfin/edpfinFVEL-dec2014.pdf)
+-Ben Moll's page on [Heterogeneous Agent Models in Continuous Time](http://www.princeton.edu/~moll/HACTproject.htm)

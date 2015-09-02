@@ -55,7 +55,7 @@ We can solve this PDE through the following finite difference scheme:
 with usual ghost nodes to satisfy boundary conditions.
 The scheme satisfies the monotonicity condition of the Barles-Souganadis Theorem. 
 \begin{itemize}
-	\item monotonicity in $G_{i+1, j}_{i-1}^{n+1}, G_{i-1, j}_{i-1}^{n+1}, G_{i, j-1}_{i-1}^{n+1}, G_{i, j-1}_{i+1}^{n+1}$ by upwinding (similarly to Achdou et al., 2014)
+	\item monotonicity in $G_{i+1, j}_{i-1}^{n+1}, G_{i-1, j}_{i-1}^{n+1}, G_{i, j-1}_{i-1}^{n+1}, G_{i, j-1}_{i+1}^{n+1}$ by upwinding 
 	\item monoticity in $G_{i, j}^{n}$  because \dots there is  no term in $G_{i, j}^{n}$. We do need a fully explicit scheme : if $(G_{ij}^{n+1})^{1-\frac{1}{\theta}}$ was replaced  by $(G_{ij}^{n})^{1-\frac{1}{\theta}}$, the scheme would not be decreasing in $G_{ij}^{n}$ for $\theta < 0$.
 \end{itemize}
 Contrary to the schemes of Achdou et al., 2014,  the scheme contains a non linear term in $G_{ij}^{n+1}$. We can solve this non-linear scheme by Newton method (first order taylor approximation of the non linear term), i.e. by iterating
@@ -66,12 +66,12 @@ Contrary to the schemes of Achdou et al., 2014,  the scheme contains a non linea
 	&+\kappa_{\sigma_j}(1-\sigma_j)^+(G_{i, j+1}^{n+1}-G_{i,j}^{n+1}) +\kappa_{\sigma_j}(1-\sigma_j)^-(G_{i, j}^{n+1}-G_{i,j-1}^{n+1})\\
 	&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j(G_{i+1, j}^{n+1} - 2 G_{i, j}^{n+1} + G_{i-1, j}^{n+1})+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j(G_{i, j+1}^{n+1} - 2 G_{i, j}^{n+1} + G_{i, j-1}^{n+1})
 \end{align*}
-This defines a linear semi explicit scheme \footnote{Actually, the schemes used in Achdou et al., 2014 can be obtained in this way.}. Note that this scheme does not satisfy the monotonicity condition of the Barles-Souganadis Theorem: the derivative of the scheme wrt $G_{ij}^{n}$ is 
+This defines a linear semi explicit scheme \footnote{Actually, the schemes used in Achdou et al., 2014 can be obtained in this way.}. Note that this scheme does not satisfy the monotonicity condition of the Barles-Souganadis Theorem since the derivative of the scheme wrt $G_{ij}^{n}$ is 
 $$\rho (1- \theta)(G_{ij}^{n})^{-\frac{1}{\theta}} (1- \frac{G_{ij}^{n+1}}{G_{ij}^{n}})$$
-Yet, this scheme converges because (i) the non linear scheme satisfies Barles-Souganadis Theorem (ii) Newton method converges to the non linear scheme
+Yet, this scheme converges because (i) the non linear fully implicit scheme satisfies Barles-Souganadis Theorem (ii) Newton method converges to the non linear scheme
 
 
-We can also solve this non linear scheme by any off the shelf non linear solver. The NLsolve package in Julia uses the Powell Dog-leg method. In this case, the updating step is a mix of gradient and Newton steps. 
+Instead of the Newton method, we could use another off the shelf non linear solver. The NLsolve package in Julia uses the Powell Dog-leg method. In this case, the updating step is a mix of gradient and Newton steps. 
 
 \subsection{Comparaison}
 
