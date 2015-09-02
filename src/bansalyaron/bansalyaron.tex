@@ -11,8 +11,8 @@
 
 \section{Derivation}
 HJB is
-$$0 = \rho \theta V_t(\frac{C_t^{(1-\gamma)\theta}}{((1-\gamma)V_t)^{\frac{1}{\theta}}}-1) + \frac{E[dV_t]}{dt}$$
-We know $V_t$ is homogeneous in  $C_t$
+$$0 = \rho \theta V_t(\frac{C_t^{\frac{1-\gamma}{\theta}}}{((1-\gamma)V_t)^{\frac{1}{\theta}}}-1) + \frac{E[dV_t]}{dt}$$
+if $c$ is multiplied by $\lambda$, then  $V_t$ is multiplied by $\lambda^{1-\gamma}$, therefore we can write
 $$V_t = \frac{C_t^{1-\gamma}}{1-\gamma} G_t$$
 Substituting in HJB, we obtain
 $$0 = \frac{\rho\theta}{1-\gamma}C_t^{1-\gamma}G_t(G_t^{-\frac{1}{\theta}}-1) + \frac{C_t^{1-\gamma}}{1-\gamma}E\frac{dG_t}{dt} +  \frac{G_t}{1-\gamma}E\frac{dC_t^{1-\gamma}}{dt}$$
@@ -24,6 +24,8 @@ We obtain
 $$0 = \rho \theta (G_t^{1-\frac{1}{\theta}}-G_t) + E\frac{dG_t}{dt} + G_t ((1-\gamma) \mu_{Ct} - \frac{1}{2}(1-\gamma)\gamma\sigma_{Ct}^2)$$
 
 \section{Long run risk model}
+\subsection{Derivation}
+
 The evolution of consumption is driven by two state variables $\mu_{t}$ and $\sigma_{t}$:
 \begin{align*}
 	\frac{dC_{t}}{C_{t}} & =  \mu_{t}dt+\nu_{D}\sqrt{\sigma_{t}}dZ_{t}\\
@@ -71,7 +73,7 @@ Yet, this scheme converges because (i) the non linear scheme satisfies Barles-So
 
 We can also solve this non linear scheme by any off the shelf non linear solver. The NLsolve package in Julia uses the Powell Dog-leg method. In this case, the updating step is a mix of gradient and Newton steps. 
 
-\section{Comparaison}
+\subsection{Comparaison}
 
 \begin{tabular}{|c|c|c|c|c|c|}
 	\hline 
