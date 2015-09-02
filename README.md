@@ -8,7 +8,7 @@ Following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models 
 
 ```julia
 # solve a static equilibrium
-using HJBviaPDE, Gadfly
+using HJBFiniteDifference, Gadfly
 π = 1.0
 K = 3.8
 ap = AiyagariProblem(π, K);
@@ -29,7 +29,7 @@ apd = DynamicAiyagariProblem(π, K, dt = dt);
 plot(x = collect(1:length(π)), y = apd.K, Geom.line)
 ```
 
-![aiyagari](https://cdn.rawgit.com/matthieugomez/HJBviaPDE.jl/master/img/aiyagari.svg)
+![aiyagari](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/aiyagari.svg)
 
 
 # Bansal Yaron
@@ -37,7 +37,7 @@ plot(x = collect(1:length(π)), y = apd.K, Geom.line)
 Parameters from Bansal Yaron Kiku (2007)
 
 ```julia
-using HJBviaPDE, Gadfly
+using HJBFiniteDifference, Gadfly
 
 # NL scheme solved using Newton method
 byp = BansalYaronProblemNewton(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
@@ -52,7 +52,7 @@ plot(byp, :s2)
 plot(byp, :m)
 ```
 
-![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBviaPDE.jl/master/img/bansalyaron.svg)
+![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/bansalyaron.svg)
 
 
 # Bibliography
