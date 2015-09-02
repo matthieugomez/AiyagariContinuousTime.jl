@@ -1,4 +1,4 @@
-module HJBviaPDE
+module HJBFiniteDifference
 
 
 import DataFrames: DataFrame
