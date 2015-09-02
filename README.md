@@ -1,6 +1,6 @@
 # Install
 ```julia
-Pkg.clone("https://github.com/matthieugomez/HJBviaPDE.jl")
+Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 ```
 
 # Aiyagari
