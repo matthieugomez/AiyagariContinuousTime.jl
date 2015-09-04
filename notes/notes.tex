@@ -27,20 +27,21 @@
 	$$0 = u_t + F(t, x, v, \partial v, \partial^2 v)$$
 	with F elliptic, i.e.if $X - Y$ positive semi definite
 	$S(x, v, \partial v, X) \geq S(x, v, \partial v, Y)$
-	\item 
+
+
 	Denote a scheme a function 
 	$$0 = S(\Delta a, v_j^{n+1} ; ...)$$
-	Barles Souganadis: the scheme must be decreasing in all variables in ..., i.e.  typically $v_{i+1}^{n+1}, v_{i-1}^{n+1}, v_{i+1}^{n}, v_{i}^{n}, v_{i+1}^{n}$  (i.e. current value at current position)
-	\item Mote carlo chain
-	$$\rho V = \max_{u} f(x, u) + \alpha(x, u) DV(x) + \sigma^2(x, u) D^2 V(x)$$
-	Fully explicit finite difference schemes can be rewritten
-	$$V = \max_{u} V + \Delta f(x, u) + \sum p(x_k, y|u)V^h(y) $$
-	ie monotiniciy of explicit scheme in $v_{i-1}^{n+1}$ and $v_{i+1}^{n+1}$ iff can be interpreted as probability
-	Monte carlo chain is a generalization of the finite difference scheme and is the right framework to understand cross derivative.
-	Any monte carlo chain works if one had the following (denonting markov chain $\xi^h_n$)
+	Barles Souganadis theorem: A scheme is convergent if it is decreasing in all variables in ..., i.e.  typically $v_{i+1}^{n+1}, v_{i-1}^{n+1}, v_{i+1}^{n}, v_{i}^{n}, v_{i+1}^{n}$  (i.e. current value at current position)
+	\item Interpretation in term of  monte carlo chain
+	For The PDE
+	$$\rho V = f(x, u) + \alpha(x, u) DV(x) + \sigma^2(x, u) D^2 V(x)$$
+	A fully explicit finite difference schemes can be rewritten
+	$$V =  V + \Delta f(x, u) + \sum p(x_k, y|u)V^h(y) $$
+	where $p(X_k, y|u) \geq 0$.  An explicit monotonous scheme can be interpreted in term of a monte carlo chain.
+
+	A monte carlo chain approximates the solution if it is consistent (denonting markov chain $\xi^h_n$)
 	$$E\Delta \xi = b(x) \Delta T$$
 	$$Var\Delta \xi = \sigma^2 (x) \Delta T$$
-	\item  Another interpretation: if savings are positive, what matters is how the value function changes when wealth increases by a small amount; and vice versa when savings are negative. The right thing to do is therefore to approximate the derivative in the direction of the movement of the state.
 \end{itemize}
 
 \subsection{Linear PDE}
@@ -58,6 +59,7 @@ How to satisfy monotonicity ?
 	\begin{itemize}
 		\item By construction, decreasing in $v_{i-1}^{n+1}$ $v_{i+1}^{n+1}$
 		\item It's also decreasing in $v_{i-1}^{n}$ and $v_{i+1}^{n}$ due to the envelop theorem ($c^n$ appears twice, once in $u(n)$, the other in the drift of asset, and derivative are equal)
+		\item  Economic interpretation: if savings are positive, what matters is how the value function changes when wealth increases by a small amount; and vice versa when savings are negative. The right thing to do is therefore to approximate the derivative in the direction of the movement of the state.
 	\end{itemize}
 	\item Second derivative
 	\begin{itemize}
