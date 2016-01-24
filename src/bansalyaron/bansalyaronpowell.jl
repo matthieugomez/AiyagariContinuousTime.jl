@@ -76,23 +76,25 @@ function BansalYaronProblemPowell(;μ = 0.0015, νD = 0.0078, κμ = 0.0212, κ�
         ij += 1
         krange = nzrange(Ct, ij)
         rows = Ctrows[krange]
-        current =  min(κμ * (μ - μs[μi]) * invdμ, 0.0) - 0.5 * νμ^2 * σs[σi] * invdμ^2
+        ∂μ = κμ * (μ - μs[μi]) * invdμ
+        ∂2μ = 0.5 * νμ^2 * σs[σi] * invdμ^2
+        current =  - min(∂μ, 0.0) + ∂2μ
         if μi > 1
             index = searchsortedfirst(rows, ij - 1)
             Ctvals[krange[index]] += current
             index = searchsortedfirst(rows, ij)
             Ctvals[krange[index]] -= current
         end
-
-        current =  - max(κμ * (μ - μs[μi]) * invdμ, 0.0) - 0.5 * νμ^2 * σs[σi] * invdμ^2
+        current =  max(∂μ, 0.0) + ∂2μ
         if μi < μn
             index = searchsortedfirst(rows, ij + 1)
             Ctvals[krange[index]] += current
             index = searchsortedfirst(rows, ij)
             Ctvals[krange[index]] -= current
         end
-
-        current = min(κσ * (1.0 - σs[σi]) * invdσ, 0.0) - 0.5 * νσ^2 * σs[σi] * invdσ^2
+        ∂σ = κσ * (1.0 - σs[σi]) * invdσ
+        ∂2σ = 0.5 * νσ^2 * σs[σi] * invdσ^2
+        current = -min(∂σ, 0.0) + ∂2σ
         if σi > 1
             index = searchsortedfirst(rows, ij - μn)
             Ctvals[krange[index]] += current
@@ -100,7 +102,7 @@ function BansalYaronProblemPowell(;μ = 0.0015, νD = 0.0078, κμ = 0.0212, κ�
             Ctvals[krange[index]] -= current
         end
 
-        current = - max(κσ * (1.0 - σs[σi]) * invdσ, 0.0) - 0.5 * νσ^2 * σs[σi] * invdσ^2
+        current = max(∂σ, 0.0) + ∂2σ
         if σi < σn
             index = searchsortedfirst(rows, ij + μn)
             Ctvals[krange[index]] += current
