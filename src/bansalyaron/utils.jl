@@ -38,6 +38,6 @@ function plot(byp::BansalYaronProblem, symbol::Symbol)
 		plot(df[condition, :], x = "volatility", y = "pricedividend", color = "drift", Geom.line)
 	elseif symbol == :m
 		condition = find((df[:volatility] .== byp.νD^2 * byp.σs[1]) | (df[:volatility] .== byp.νD^2 * byp.σs[50]) | (df[:volatility] .== byp.νD^2 * byp.σs[end]))
-		plot(df[condition, :], x = "drift", y = "pricedividendd", color = "volatility", Geom.line)
+		plot(df[condition, :], x = "drift", y = "pricedividend", color = "volatility", Geom.line)
 	end
 end
