@@ -38,18 +38,29 @@ Parameters from Bansal Yaron Kiku (2007)
 
 ```julia
 using HJBFiniteDifference, Gadfly
+byp = BansalYaronProblem(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
 
-# NL scheme solved using Newton method
-byp = BansalYaronProblemNewton(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
-@time solve!(byp)
-plot(byp, :s2)
-plot(byp, :m)
+# non linear solver: Newton method
+solution = solve(byp, method = :newton)
+plot(byp, solution, :s2)
+plot(byp, solution, :m)
 
-# NL scheme solved using Powell Dog-leg method
-byp = BansalYaronProblemPowell(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
-@time solve!(byp)
-plot(byp, :s2)
-plot(byp, :m)
+# non linear solver : trust region method
+solution = solve(byp, method = :trust_region)
+plot(byp, solution, :s2)
+plot(byp, solution, :m)
+
+# ODE solver : 23s (use Jacobian)
+solution = solve(byp, method = :ode23s)
+plot(byp, solution, :s2)
+plot(byp, solution, :m)
+
+# ODE solver : 23 
+solution = solve(byp, method = :ode23)
+plot(byp, solution, :s2)
+plot(byp, solution, :m)
+
+
 ```
 
 ![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/bansalyaron.svg)

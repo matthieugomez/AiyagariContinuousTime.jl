@@ -3,21 +3,11 @@ module HJBFiniteDifference
 
 import DataFrames: DataFrame
 import Gadfly: plot, Geom
-import NLsolve: nlsolve, DifferentiableSparseMultivariateFunction
+import NLsolve: nlsolve, DifferentiableGivenSparseMultivariateFunction
 import Distances: chebyshev
-
-
-##############################################################################
-##
-## Exported methods and types 
-##
-##############################################################################
-export solve!,
-AiyagariProblem,
-DynamicAiyagariProblem,
-BansalYaronProblem,
-BansalYaronProblemNewton,
-BansalYaronProblemPowell
+using ODE
+using Sundials
+using ForwardDiff
 
 ##############################################################################
 ##
@@ -27,8 +17,20 @@ BansalYaronProblemPowell
 include("aiyagari/aiyagari.jl")
 include("aiyagari/dynamicaiyagari.jl")
 
-include("bansalyaron/utils.jl")
-include("bansalyaron/bansalyaronnewton.jl")
-include("bansalyaron/bansalyaronpowell.jl")
+include("bansalyaron/bansalyaronproblem.jl")
+include("bansalyaron/jacobianmethods.jl")
+include("bansalyaron/nonjacobianmethods.jl")
+
+
+
+##############################################################################
+##
+## Exported methods and types 
+##
+##############################################################################
+export solve,
+AiyagariProblem,
+DynamicAiyagariProblem,
+BansalYaronProblem
 
 end

@@ -1,4 +1,3 @@
-
 \documentclass[english]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
@@ -16,17 +15,15 @@ Let's define $G_t$ such that
 $$V_t = \frac{C_t^{1-\gamma}}{1-\gamma} G_t$$
 By Ito, 
 $$0 = \rho\theta(G_t^{1-\frac{1}{\theta}}-G_t)   +  G_t E\frac{\frac{dC_t^{1-\gamma}}{C_t^{1-\gamma}}}{dt} + E\frac{dG_t}{dt} + E\frac{dG_t\frac{dC_t^{1-\gamma}}{C_t^{1-\gamma}}}{dt}$$
-
 Denoting $\mu_{C}$ and $\sigma_{C}$ the geometric drift of $C_t$, we have
 \begin{align*}
 	\frac{dC_{t}^{1-\gamma}}{C_{t}^{1-\gamma}}=((1-\gamma)\mu_{C}-\frac{1}{2}(1-\gamma)\gamma\sigma^{2}_{C})dt + (1-\gamma)\sigma_{C}dW_t
 \end{align*}
-
-
-Injecting this expression into HJB and denoting $\mu_G, \sigma_G$ the arithmetic drift and volatility of $C_t$
+Injecting this expression into HJB and denoting $\mu_G, \sigma_G$ the arithmetic drift and volatility of $G_t$
 $$0 = \rho \theta (G_t^{1-\frac{1}{\theta}}-G_t)  + G_t ((1-\gamma) \mu_{C} - \frac{1}{2}(1-\gamma)\gamma\sigma_{C}'\sigma_{C}) +  \mu_G + \sigma_G'(1-\gamma)\sigma_{C}$$
 
 \section{Long run risk model}
+
 \subsection{Derivation}
 We now assume that the evolution of consumption is driven by two state variables $\mu_{t}$ and $\sigma_{t}$:
 \begin{align*}
@@ -47,35 +44,27 @@ Boundary coundition  = reflectiving barrier
 	\partial_\sigma G(u, \underline{\sigma}) &= 0  \\
 	\partial_\sigma G(u, \overline{\sigma}) &= 0 
 \end{align*}
-We can solve this PDE through the following finite difference scheme:
+I think the best way to incorporate these boundary conditions is to adopt an upwinding scheme. The upwinding scheme says to approximate the first derivative by the forward difference when the drift of a state variable is positive, and by the backward difference when the drift of a state variable is negative.
 \begin{align*}
-	0&= \rho \theta[(G_{ij}^{n+1})^{1-\frac{1}{\theta}}- G_{ij}^{{n+1}}]+G_{ij}^{n+1}((1-\gamma)\mu_i-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
-	&+\kappa_{\mu_i}(\bar{\mu}-\mu_i)^+(G_{i+1, j}^{n+1}-G_{i, j}^{n+1}) +\kappa_{\mu_i}(\bar{\mu}-\mu_i)^-(G_{i, j}^{n+1}-G_{i-1, j}^{n+1})\\
-	&+\kappa_{\sigma_j}(1-\sigma_j)^+(G_{i, j+1}^{n+1}-G_{i,j}^{n+1}) +\kappa_{\sigma_j}(1-\sigma_j)^-(G_{i, j}^{n+1}-G_{i,j-1}^{n+1})\\
-	&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j(G_{i+1, j}^{n+1} - 2 G_{i, j}^{n+1} + G_{i-1, j}^{n+1})+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j(G_{i, j+1}^{n+1} - 2 G_{i, j}^{n+1} + G_{i, j-1}^{n+1})
+	0&= \rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]+G_{ij}((1-\gamma)\mu_i-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
+	&+\kappa_{\mu_i}(\bar{\mu}-\mu_i)^+\frac{G_{i+1, j}-G_{i, j}}{\Delta \mu} +\kappa_{\mu_i}(\bar{\mu}-\mu_i)^-\frac{G_{i, j}-G_{i-1, j}}{\Delta \mu}\\
+	&+\kappa_{\sigma_j}(1-\sigma_j)^+\frac{G_{i, j+1}-G_{i,j}}{\Delta \sigma} +\kappa_{\sigma_j}(1-\sigma_j)^-\frac{G_{i, j}-G_{i,j-1}}{\Delta \sigma}\\
+	&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j\frac{G_{i+1, j} - 2 G_{i, j} + G_{i-1, j}}{(\Delta\mu)^2}+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j\frac{G_{i, j+1} - 2 G_{i, j} + G_{i, j-1}}{(\Delta\sigma)^2}
 \end{align*}
-with usual ghost nodes to satisfy boundary conditions.
-The scheme satisfies the monotonicity condition of the Barles-Souganadis Theorem. 
+
+At the frontier of the state space, the second order derivative uses the value of $G$ at nodes not on the grid (``ghost nodes''): set the value of these nodes to the value of nodes at the frontier.
+
+
+Denote $y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n})$. The scheme can be solved in two ways
 \begin{itemize}
-	\item monotonicity in $G_{i+1, j}_{i-1}^{n+1}, G_{i-1, j}_{i-1}^{n+1}, G_{i, j-1}_{i-1}^{n+1}, G_{i, j-1}_{i+1}^{n+1}$ by upwinding 
-	\item monoticity in $G_{i, j}^{n}$  because \dots there is  no term in $G_{i, j}^{n}$. We do need a fully explicit scheme : if $(G_{ij}^{n+1})^{1-\frac{1}{\theta}}$ was replaced  by $(G_{ij}^{n})^{1-\frac{1}{\theta}}$, the scheme would not be decreasing in $G_{ij}^{n}$ for $\theta < 0$.
+	\item Use a non linear solver to solve $F(y) = 0$, using for instance the Powell or Newton methods. Both methods require to specify the Jacobian of $F$. 
+	\item Use a ODE solver to solve $F(y) = \dot{y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE. Some MATLAB solvers like \printt{ode23s} also accept  the Jacobian of $F$ as an imput. This makes the solution faster, but this requires to program a little bit more.
 \end{itemize}
-Contrary to the schemes of Achdou et al., 2014,  the scheme contains a non linear term in $G_{ij}^{n+1}$. We can solve this non-linear scheme by Newton method (first order taylor approximation of the non linear term), i.e. by iterating
-\begin{align*}
-	0&= \rho (G_{ij}^{n})^{1-\frac{1}{\theta}}+ \rho  (\theta-1) (G_{ij}^{n})^{-\frac{1}{\theta}}G_{ij}^{n+1}\\
-	&- \rho \theta G_{ij}^{{n+1}}+G_{ij}^{n+1}((1-\gamma)\mu_i-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
-	&+\kappa_{\mu_i}(\bar{\mu}-\mu_i)^+(G_{i+1, j}^{n+1}-G_{i, j}^{n+1}) +\kappa_{\mu_i}(\bar{\mu}-\mu_i)^-(G_{i, j}^{n+1}-G_{i-1, j}^{n+1})\\
-	&+\kappa_{\sigma_j}(1-\sigma_j)^+(G_{i, j+1}^{n+1}-G_{i,j}^{n+1}) +\kappa_{\sigma_j}(1-\sigma_j)^-(G_{i, j}^{n+1}-G_{i,j-1}^{n+1})\\
-	&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j(G_{i+1, j}^{n+1} - 2 G_{i, j}^{n+1} + G_{i-1, j}^{n+1})+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j(G_{i, j+1}^{n+1} - 2 G_{i, j}^{n+1} + G_{i, j-1}^{n+1})
-\end{align*}
-This defines a linear semi explicit scheme \footnote{Actually, the schemes used in Achdou et al., 2014 can be obtained in this way.}. Note that this scheme does not satisfy the monotonicity condition of the Barles-Souganadis Theorem since the derivative of the scheme wrt $G_{ij}^{n}$ is 
-$$\rho (1- \theta)(G_{ij}^{n})^{-\frac{1}{\theta}} (1- \frac{G_{ij}^{n+1}}{G_{ij}^{n}})$$
-Yet, this scheme converges because (i) the non linear fully implicit scheme satisfies Barles-Souganadis Theorem (ii) Newton method converges to the non linear scheme
+
+Both methods require an initial guess. Use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
 
 
-Instead of the Newton method, we could use another off the shelf non linear solver. The NLsolve package in Julia uses the Powell Dog-leg method. In this case, the updating step is a mix of gradient and Newton steps. 
-
-\subsection{Comparaison}
+\subsection{Comparison}
 
 \begin{tabular}{|c|c|c|c|c|c|}
 	\hline 
@@ -89,7 +78,7 @@ Instead of the Newton method, we could use another off the shelf non linear solv
 	mean volatility & $\sigma^{2}$ & 0.00006084 & $\nu_{D}$ & 0.0078 & $\sqrt{\sigma^{2}}=\nu_{D}$
 	\\
 	\hline 
-	growth persistence & $\rho$ & 0.979 & $\kappa_{\mu}$ & 0.0212 &  - \log(\rho) = \kappa_\mu 
+	growth persistence & $\rho$ & 0.979 & $\kappa_{\mu}$ & 0.0212 & $ - \log(\rho) = \kappa_\mu$ 
 	\\
 	\hline 
 	volatility persistence & $\nu_{1}$ & 0.987 & $\kappa_{\sigma}$ & 0.0131 & $-\log\left(\nu_{1}\right)=\kappa_{\sigma}$
@@ -107,7 +96,7 @@ Instead of the Newton method, we could use another off the shelf non linear solv
 	RRA & $1-\gamma$(RRA) & 7.5 or 10 & $1-\gamma$ & -6.5 or -9 & $1-\text{RRA}=1-\gamma$
 	\\
 	\hline 
-	IES & $\psi$ & 1.5 & $\psi$ & 1.5 & \psi = \psi
+	IES & $\psi$ & 1.5 & $\psi$ & 1.5 & $\psi = \psi$
 	\\
 	\hline
 \end{tabular}
