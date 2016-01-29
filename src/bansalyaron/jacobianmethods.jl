@@ -25,6 +25,8 @@ function structure(byp::BansalYaronProblem)
         rows = Crows[krange]
         ∂μ = byp.κμ * (byp.μ - byp.μs[μi]) * byp.invdμ
         ∂2μ = 0.5 * byp.νμ^2 * byp.σs[σi] * byp.invdμ^2
+        ∂σ = byp.κσ * (1.0 - byp.σs[σi]) * byp.invdσ
+        ∂2σ = 0.5 * byp.νσ^2 * byp.σs[σi] * byp.invdσ^2
         current =  - min(∂μ, 0.0) + ∂2μ
         if μi > 1
             index = searchsortedfirst(rows, ij - 1)
@@ -40,8 +42,7 @@ function structure(byp::BansalYaronProblem)
             index = searchsortedfirst(rows, ij)
             Cvals[krange[index]] -= current
         end
-        ∂σ = byp.κσ * (1.0 - byp.σs[σi]) * byp.invdσ
-        ∂2σ = 0.5 * byp.νσ^2 * byp.σs[σi] * byp.invdσ^2
+       
         current = - min(∂σ, 0.0) + ∂2σ
         if σi > 1
             index = searchsortedfirst(rows, ij - μn)
@@ -85,6 +86,12 @@ function f!(byp::BansalYaronProblem, C, x::Vector{Float64}, out::Vector{Float64}
     end
 end
 
+function f(byp::BansalYaronProblem, C, x::Vector{Float64})
+    out = deepcopy(x)
+    f!(byp, C, x, out)
+    return out
+end
+
 # Express Jac(F)(y) from Ct
 function g!(byp::BansalYaronProblem, Ct, x::Vector{Float64}, out)
     ij = zero(Int)
@@ -118,14 +125,13 @@ end
 ##
 ##############################################################################
 
-
 function solve(::Type{Val{:ode23s}}, byp::BansalYaronProblem)
     C = structure(byp)
     Ct = C'
     tout, yout = ODE.ode23s(
-        (t, y) -> (out = deepcopy(y) ;  f!(byp, C, y, out) ; return out), 
+        (t, y) -> f(byp, C, y),
         byp.V, 
-        [0.0; 20 * logspace(-1., 7., 9)]; 
+        [0.0; 10.0]; 
         jacobian = (t, y) -> g(byp, Ct, y))
     return yout[end]
 end

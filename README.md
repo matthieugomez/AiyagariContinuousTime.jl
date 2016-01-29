@@ -59,8 +59,6 @@ plot(byp, solution, :m)
 solution = solve(byp, method = :ode23)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
-
-
 ```
 
 ![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/bansalyaron.svg)

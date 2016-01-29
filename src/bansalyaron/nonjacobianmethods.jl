@@ -3,41 +3,39 @@
 ## Solve
 ##
 ##############################################################################
-
-function shift(x::Vector, i, s)
-    newi = i + s
-    if (newi <= length(x)) & (newi >= 1)
-        return x[newi]
-    else
-        return x[i]
-    end
+type Grid{T}
+    x::Vector{T}
+    I::Int
+    J::Int
 end
 
+function Base.getindex(x::Grid, i, j)
+    i1 = min(max(i, 1), x.I)
+    j1 = min(max(j, 1), x.J)
+    return x.x[i1 + x.I * (j1 - 1)]
+end
+
+
 function F!(byp::BansalYaronProblem, y::Vector, ydot::Vector)
-    ij = zero(Int)
     μn = length(byp.μs)
     σn = length(byp.σs)
-    @inbounds for σi in 1:σn, μi in 1:μn
+    fy = Grid(y, μn, σn)
+    ij = 0
+    for σi in 1:σn, μi in 1:μn
         ij += 1
         ∂μ = byp.κμ * (byp.μ - byp.μs[μi]) * byp.invdμ
         ∂2μ = 0.5 * byp.νμ^2 * byp.σs[σi] * byp.invdμ^2
         ∂σ = byp.κσ * (1.0 - byp.σs[σi]) * byp.invdσ
         ∂2σ = 0.5 * byp.νσ^2 * byp.σs[σi] * byp.invdσ^2
-        current = 0.0
-        current += ∂2μ * (shift(y, ij, 1) + shift(y, ij, -1) - 2 * shift(y, ij, 0)) 
-        if ∂μ > 0 
-            current += ∂μ * (shift(y, ij, 1) - shift(y, ij, 0))
-        else 
-            current += ∂μ * (shift(y, ij, 0) - shift(y, ij, -1))
-        end
-        current += ∂2σ * (shift(y, ij, μn) + shift(y, ij, -μn) - 2 * shift(y, ij, 0))
-        if ∂σ > 0 
-            current += ∂σ * (shift(y, ij, μn) - shift(y, ij, 0))
-        else 
-            current += ∂σ * (shift(y, ij, 0) - shift(y, ij, - μn))
-        end 
-        current += byp.ρ * byp.θ * max(y[ij], 0.0)^(1-1/byp.θ) + (- byp.ρ * byp.θ + (1-byp.γ) * byp.μs[μi] - 0.5 * (1-byp.γ) * byp.γ * byp.νD^2 * byp.σs[σi])*y[ij] 
-        ydot[ij] = current
+        ydot[ij] = (byp.ρ * byp.θ * max(fy[μi, σi], 0.0)^(1-1/byp.θ)
+                    + (- byp.ρ * byp.θ + (1-byp.γ) * byp.μs[μi] - 0.5 * (1-byp.γ) * byp.γ * byp.νD^2 * byp.σs[σi]) * fy[μi, σi] 
+                    + max(∂μ, 0.0) * (fy[μi+1, σi] - fy[μi, σi]) 
+                    + min(∂μ, 0.0) * (fy[μi, σi] - fy[μi-1, σi])
+                    + max(∂σ, 0.0) * (fy[μi, σi+1] - fy[μi, σi]) 
+                    + min(∂σ, 0.0) * (fy[μi, σi] -  fy[μi, σi-1])
+                    + ∂2μ * (fy[μi+1, σi] + fy[μi-1, σi]  - 2.0 * fy[μi, σi]) 
+                    + ∂2σ * (fy[μi, σi+1] + fy[μi, σi-1] - 2.0 * fy[μi, σi]) 
+                    )
     end
     @show norm(ydot)
     return ydot
