@@ -61,7 +61,7 @@ plot(byp, solution, :s2)
 plot(byp, solution, :m)
 ```
 
-![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/bansalyaron.svg)
+![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byg.svg)
 
 
 # Bibliography

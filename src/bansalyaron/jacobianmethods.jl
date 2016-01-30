@@ -27,38 +27,48 @@ function structure(byp::BansalYaronProblem)
         ∂2μ = 0.5 * byp.νμ^2 * byp.σs[σi] * byp.invdμ^2
         ∂σ = byp.κσ * (1.0 - byp.σs[σi]) * byp.invdσ
         ∂2σ = 0.5 * byp.νσ^2 * byp.σs[σi] * byp.invdσ^2
-        current =  - min(∂μ, 0.0) + ∂2μ
-        if μi > 1
+        if (μi > 1) & (μi < μn)
             index = searchsortedfirst(rows, ij - 1)
-            Cvals[krange[index]] += current
+            Cvals[krange[index]] += - ∂μ * 0.5 + ∂2μ
+            index = searchsortedfirst(rows, ij+1)
+            Cvals[krange[index]] += ∂μ * 0.5 + ∂2μ
             index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            Cvals[krange[index]] += - 2 * ∂2μ
         end
-
-        current =  max(∂μ, 0.0) + ∂2μ
-        if μi < μn
-            index = searchsortedfirst(rows, ij + 1)
-            Cvals[krange[index]] += current
+        # arount the gris we just remove the second derivative (because we think that at the border volatility of state variables is zero). And we use forward/bacakward derivative
+        if μi == 1
             index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            Cvals[krange[index]] += - ∂μ
+            index = searchsortedfirst(rows, ij+1)
+            Cvals[krange[index]] += + ∂μ
         end
-       
-        current = - min(∂σ, 0.0) + ∂2σ
-        if σi > 1
+        if μi == μn
+            index = searchsortedfirst(rows, ij-1)
+            Cvals[krange[index]] += - ∂μ
+            index = searchsortedfirst(rows, ij)
+            Cvals[krange[index]] += + ∂μ
+        end
+        if (σi > 1) & (σi < σn)
             index = searchsortedfirst(rows, ij - μn)
-            Cvals[krange[index]] += current
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
-        end
-
-        current = max(∂σ, 0.0) + ∂2σ
-        if σi < σn
+            Cvals[krange[index]] += - ∂σ * 0.5 + ∂2σ
             index = searchsortedfirst(rows, ij + μn)
-            Cvals[krange[index]] += current
+            Cvals[krange[index]] += ∂σ * 0.5 + ∂2σ
             index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            Cvals[krange[index]] += - 2 * ∂2σ
         end
-
+        # arount the gris we just remove the second derivative (because we think that at the border volatility of state variables is zero). And we use forward/bacakward derivative
+        if σi == 1
+            index = searchsortedfirst(rows, ij)
+            Cvals[krange[index]] += - ∂σ
+            index = searchsortedfirst(rows, ij + μn)
+            Cvals[krange[index]] += + ∂σ
+        end
+        if σi == σn
+            index = searchsortedfirst(rows, ij - μn)
+            Cvals[krange[index]] += - ∂σ
+            index = searchsortedfirst(rows, ij)
+            Cvals[krange[index]] += + ∂σ
+        end
         current = - byp.ρ * byp.θ + (1-byp.γ) * byp.μs[μi] - 0.5 * (1-byp.γ) * byp.γ * byp.νD^2 * byp.σs[σi]
         index = searchsortedfirst(rows, ij)
         Cvals[krange[index]] += current

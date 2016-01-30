@@ -31,6 +31,7 @@ include("bansalyaron/nonjacobianmethods.jl")
 export solve,
 AiyagariProblem,
 DynamicAiyagariProblem,
-BansalYaronProblem
+BansalYaronProblem,
+plot_ll
 
 end

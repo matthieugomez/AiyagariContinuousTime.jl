@@ -27,6 +27,7 @@ function F!(byp::BansalYaronProblem, y::Vector, ydot::Vector)
         ∂2μ = 0.5 * byp.νμ^2 * byp.σs[σi] * byp.invdμ^2
         ∂σ = byp.κσ * (1.0 - byp.σs[σi]) * byp.invdσ
         ∂2σ = 0.5 * byp.νσ^2 * byp.σs[σi] * byp.invdσ^2
+        
         ydot[ij] = (byp.ρ * byp.θ * max(fy[μi, σi], 0.0)^(1-1/byp.θ)
                     + (- byp.ρ * byp.θ + (1-byp.γ) * byp.μs[μi] - 0.5 * (1-byp.γ) * byp.γ * byp.νD^2 * byp.σs[σi]) * fy[μi, σi] 
                     + max(∂μ, 0.0) * (fy[μi+1, σi] - fy[μi, σi]) 

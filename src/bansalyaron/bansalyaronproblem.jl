@@ -73,13 +73,31 @@ function plot(byp::BansalYaronProblem, solution, symbol::Symbol)
     pd = 1/byp.θ * log(max(solution, 0.0)) - log(byp.ρ)
     m = repeat(byp.μs, outer = [length(byp.σs)])
     s2 = repeat(byp.νD^2 * byp.σs, inner = [length(byp.μs)])
-    df = DataFrame(V = solution, pricedividend = pd, drift = m, volatility = s2)
+    df = DataFrame(wealthconsumption = pd, drift = m, volatility = s2)
     if symbol == :s2
         df = df[df[:, :volatility] .< 0.00010, :]
         condition = find((df[:drift] .== byp.μs[1]) | (df[:drift] .== byp.μs[50]) | (df[:drift] .== byp.μs[end]))
-        plot(df[condition, :], x = "volatility", y = "pricedividend", color = "drift", Geom.line)
+        plot(df[condition, :], x = "volatility", y = "wealthconsumption", color = "drift", Geom.line)
     elseif symbol == :m
         condition = find((df[:volatility] .== byp.νD^2 * byp.σs[1]) | (df[:volatility] .== byp.νD^2 * byp.σs[50]) | (df[:volatility] .== byp.νD^2 * byp.σs[end]))
-        plot(df[condition, :], x = "drift", y = "pricedividend", color = "volatility", Geom.line)
+        plot(df[condition, :], x = "drift", y = "wealthconsumption", color = "volatility", Geom.line)
     end
 end
+
+function plot_ll(byp::BansalYaronProblem, symbol::Symbol)
+    A1 = (1 - 1 / byp.ψ) / (1 - 0.997 * exp(-byp.κμ))
+    A2 = 0.5 * byp.θ * ((1 - 1 / byp.ψ)^2 + (A1 * 0.997 * byp.νμ / byp.νD)^2) / (1 - 0.997 * exp(-byp.κσ))
+    m = repeat(byp.μs, outer = [length(byp.σs)])
+    s2 = repeat(byp.νD^2 * byp.σs, inner = [length(byp.μs)])
+    pd = A1 .* m + A2 .* s2
+    df = DataFrame(wealthconsumption = pd, drift = m, volatility = s2)
+    if symbol == :s2
+        df = df[df[:, :volatility] .< 0.00010, :]
+        condition = find((df[:drift] .== byp.μs[1]) | (df[:drift] .== byp.μs[50]) | (df[:drift] .== byp.μs[end]))
+        plot(df[condition, :], x = "volatility", y = "wealthconsumption", color = "drift", Geom.line)
+    elseif symbol == :m
+        condition = find((df[:volatility] .== byp.νD^2 * byp.σs[1]) | (df[:volatility] .== byp.νD^2 * byp.σs[50]) | (df[:volatility] .== byp.νD^2 * byp.σs[end]))
+        plot(df[condition, :], x = "drift", y = "wealthconsumption", color = "volatility", Geom.line)
+    end
+end
+

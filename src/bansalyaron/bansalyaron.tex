@@ -101,16 +101,24 @@ Both methods require an initial guess. Use the value function for the stationary
 	\hline
 \end{tabular}
 Also,  $\theta = (1-\gamma)/(1- 1/\psi)$ = -19.50 or -27.
-Let's express the consumption to wealth ratio $k_t$ in term of state variables.
-$$V = G_tk_t^{1-\gamma}\frac{W^{1-\gamma}}{(1-\gamma)}$$
+
+
+Let's express the  wealth to consumption ratio $k_t$ in term of state variables.
+$$V = G_tk_t^{\gamma - 1}\frac{W^{1-\gamma}}{(1-\gamma)}$$
 FOC for consumption can be written
-$$k_t = \rho^{\psi} k_t^{1-\psi}G_t^\frac{1-\psi}{1-\gamma}$$
+$$k_t^{-1} = \rho^{\psi} k_t^{\psi - 1}G_t^\frac{1-\psi}{1-\gamma}$$
 General equilibrium gives
-$$ k_t = \rho G_t^{-1/\theta}$$
+$$ k_t = \rho^{-1} G_t^{1/\theta}$$
 Bansal Yaron find
 \begin{align*}
-	\frac{1}{\theta}\log G_t-\log \rho &\approx A_1 \mu_t + A_2 \nu_D^2\sigma_t\\
+	k_t &\propto A_1 \mu_t + A_2 \nu_D^2\sigma_t\\
 	A1 &= \frac{1-\frac{1}{\psi}}{1-0.997 e^{-\kappa_\mu}}\\
-	A2 &= 0.5\theta\frac{(1 - \frac{1}{\psi})^2 + (A_1  \kappa_1  \frac{\nu_\mu}{\nu_D^2})^2}{1-0.997e^{-\kappa_\sigma}}
+	A2 &= 0.5\theta\frac{(1 - \frac{1}{\psi})^2 + (A_1  0.997 \frac{\nu_\mu}{\nu_D})^2}{1-0.997e^{-\kappa_\sigma}}
 \end{align*}
+
+\section{Solving HJB}
+Suppose we have a function for the sdf
+$$\frac{\rho}{1-\frac{1}{\psi}}&=  -\frac{\rho^\psi}{1-\psi}\xi^{1-\psi}  +r_f + (\frac{\pi}{\gamma} - \frac{\gamma-1}{\gamma}\sigma^\xi)\pi +\mu_{\xi}-\frac{\gamma}{2}( (\frac{\pi}{\gamma} - \frac{\gamma-1}{\gamma}\sigma^\xi)^2 +\sigma^2_\xi -2(1-\gamma)(\frac{\pi}{\gamma} - \frac{\gamma-1}{\gamma}\sigma^\xi)\sigma_\xi)$$
+
+
 \end{document}
