@@ -3,7 +3,7 @@ module HJBFiniteDifference
 
 import DataFrames: DataFrame
 import Gadfly: plot, Geom
-import NLsolve: nlsolve, DifferentiableGivenSparseMultivariateFunction
+import NLsolve: nlsolve, DifferentiableGivenSparseMultivariateFunction, DifferentiableMultivariateFunction
 import Distances: chebyshev
 using ODE
 using Sundials

@@ -50,15 +50,22 @@ solution = solve(byp, method = :trust_region)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
 
+# non linear solver: trust region method with analytical diff
+solution = solve(byp, method = :adiff)
+plot(byp, solution, :s2)
+plot(byp, solution, :m)
+
 # ODE solver : 23s (use Jacobian)
 solution = solve(byp, method = :ode23s)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
 
-# ODE solver : 23 
-solution = solve(byp, method = :ode23)
+# ODE solver : 45
+solution = solve(byp, method = :ode45)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
+
+
 ```
 
 ![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byg.svg)

@@ -53,16 +53,6 @@ How to satisfy monotonicity ?
 		\begin{itemize}
 			\item If $f$ is linear in $v$ then replace by $v^{n+1}$ here too
 			\item If $f$ is monotone in $v$, then use $v^n$ there. This includes case of optimal policy in $v$ by envelop theorem.
-			\item The resulting scheme is monotonous Why? envelop theorem.
-			\item     One caveat: you have to make sure you're using the same derivatives to compute the control and in the rest of the PDE so that envelop theorem applies.
-			Since $v$ is generally concave in $a$, $s_F \leq s_B$, where $s_F$ is the drift computed using forward difference for consumption and $s_B$ the backward. Therefore the following situation happens: positive difference for $\partial V$ when computing $c$ gives negative drift, while positive difference gives positive drift). For these grid points, set the derivative of the value function equal to the case where drift is zero (i.e stationary value)
-			\item This circularity becomes too complicated with multiple controls . In this case, split the drift in two
-			$$S = \rho v_j - u(c_j) + \frac{v_j-v_{j-1}}{\Delta a} c_{j, B} - \frac{v_{j+1}-v_j}{\Delta a} (w + ra_j)$$
-			It is done in the Moll notes with fixed cost
-			\begin{align*}
-				\rho V =\max_c u(c) + V_b(r^b-\chi(d, a) - c) + V_a(r^a a + d)
-				V_b \chi_d(d, a) = V_a
-			\end{align*}
 		\end{itemize}
 		\item If $f$ is non linear in $v$ and non monotonous, this requires to use a non linear algorithm
 	\end{itemize}
@@ -126,6 +116,37 @@ How to satisfy monotonicity ?
 
 \subsection{Others}
 
+\subsubsection{Optimization}
+$$\rho V = \max_u f(V, u) + \mu(x, u) \partial V + \frac{1}{2}\sigma^2(x, u) \partial^2V$$ 
+
+
+You need to make sure the terms that diappear in the envelop theorem do disappear in your setup.
+
+\begin{itemize}
+	\item In the implicit scheme, the case of one state variable, this means that y
+
+	$$u'(c) = V_c c$$
+
+	i.e. you need to use the same derivative to compute $c$ so that the drift has the same sign
+
+	Since $v$ is generally concave in $a$, $s_F \leq s_B$, where $s_F$ is the drift computed using forward difference for consumption and $s_B$ the backward. Therefore the following situation happens: positive difference for $\partial V$ when computing $c$ gives negative drift, while positive difference gives positive drift). For these grid points, set the derivative of the value function equal to the case where drift is zero (i.e stationary value)
+
+
+	\item This circularity becomes too complicated with multiple controls.
+	The trick in this case is to divide a drift in two. Then when deriving and obtaing FOC, you can obtain differen backward/forwad for the derivative $V_b$ in different FOC 
+
+	For instnce
+		$$V_a d = V_b d$$
+		means that you must use the same backward/forward in $V_a$ $V_b$ and when computing $d$
+		$$u'_c = V_b c$$
+		means that you must hte same backward/forawrd in $V_b$ when computing $c$. But if you split the drift in $b$ in $c$ and $d$ they now can be different.
+
+
+		It is done in the Moll notes for the problem fixed cost
+
+	\item If you have a semi explicit scheme, the term used when computing $c_t$ is the past derivative while $V_c$ is the future derivative. So I'm not sure why circular upwinding is important /sufficient
+\end{itemize}
+
 \subsubsection{Discrete maximization}
 
 \begin{itemize}
@@ -182,6 +203,13 @@ Is there existence theorem for the scheme?
 		\end{itemize}
 	\end{itemize}
 \end{itemize}
+
+\subsection{HJB}
+\begin{align*}
+	\hat{c}_t&=\xi_t^{1-\psi}\rho^\psi\\
+	\sigma_w &= \frac{\pi}{\gamma} - \frac{\gamma-1}{\gamma}\sigma^\xi\\
+	\frac{\rho}{1-\frac{1}{\psi}}&=  -\frac{\rho^\psi}{1-\psi}\xi^{1-\psi}  +r_f + \sigma_w'\pi +\mu_{\xi}-\frac{\gamma}{2}( \sigma^2_w +\sigma^2_\xi -2(1-\gamma)\sigma_w\sigma_\xi)
+\end{align*}
 
 \section{Method of line}
 The idea is to write the explicit system with $t$ non discretized. So instead of writing
