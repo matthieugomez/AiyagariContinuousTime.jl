@@ -10,68 +10,46 @@ function structure(byp::BansalYaronProblem)
     σn = length(byp.σs)
     # set up C
     C = spdiagm(
-        (ones(μn*σn), ones(μn*σn-1), ones(μn*σn-1), ones((σn-1)*μn), ones((σn-1)*μn)),
-        (0, 1, -1, μn, - μn)
+        (ones(μn*σn), ones(μn*σn-1), ones(μn*σn-1), ones(μn*σn-2), ones(μn*σn-2), ones((σn-1)*μn), ones((σn-1)*μn), ones((σn-2)*μn), ones((σn-2)*μn)),
+        (0, 1, -1, 2, -2, μn, - μn, 2 * μn, - 2 * μn)
     )
-    Crows = rowvals(C) 
-    Cvals = nonzeros(C) 
-    fill!(Cvals, zero(Float64))
+    fill!(nonzeros(C), zero(Float64))
 
     # fill C
     ij = zero(Int)
-   @inbounds for σi in 1:σn, μi in 1:μn
+    @inbounds for σi in 1:σn, μi in 1:μn
         ij += 1
-        krange = nzrange(C, ij)
-        rows = Crows[krange]
         ∂μ = byp.κμ * (byp.μ - byp.μs[μi]) * byp.invdμ
         ∂2μ = 0.5 * byp.νμ^2 * byp.σs[σi] * byp.invdμ^2
+        if μi == 1
+            C[ij, ij] += - 0.5 * 3 * ∂μ
+            C[ij + 1, ij] +=  0.5 * 4 * ∂μ
+            C[ij + 2, ij] += - 0.5 * ∂μ
+        elseif μi == μn
+            C[ij, ij] += 0.5 * 3 * ∂μ
+            C[ij - 1, ij] += - 0.5 * 4 * ∂μ
+            C[ij - 2, ij] += 0.5 * ∂μ
+        else
+            C[ij - 1, ij] += - ∂μ * 0.5 + ∂2μ
+            C[ij + 1, ij] += ∂μ * 0.5 + ∂2μ
+            C[ij, ij] += - 2 * ∂2μ
+        end
         ∂σ = byp.κσ * (1.0 - byp.σs[σi]) * byp.invdσ
         ∂2σ = 0.5 * byp.νσ^2 * byp.σs[σi] * byp.invdσ^2
-        if (μi > 1) & (μi < μn)
-            index = searchsortedfirst(rows, ij - 1)
-            Cvals[krange[index]] += - ∂μ * 0.5 + ∂2μ
-            index = searchsortedfirst(rows, ij+1)
-            Cvals[krange[index]] += ∂μ * 0.5 + ∂2μ
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] += - 2 * ∂2μ
-        end
-        # arount the gris we just remove the second derivative (because we think that at the border volatility of state variables is zero). And we use forward/bacakward derivative
-        if μi == 1
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] += - ∂μ
-            index = searchsortedfirst(rows, ij+1)
-            Cvals[krange[index]] += + ∂μ
-        end
-        if μi == μn
-            index = searchsortedfirst(rows, ij-1)
-            Cvals[krange[index]] += - ∂μ
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] += + ∂μ
-        end
-        if (σi > 1) & (σi < σn)
-            index = searchsortedfirst(rows, ij - μn)
-            Cvals[krange[index]] += - ∂σ * 0.5 + ∂2σ
-            index = searchsortedfirst(rows, ij + μn)
-            Cvals[krange[index]] += ∂σ * 0.5 + ∂2σ
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] += - 2 * ∂2σ
-        end
-        # arount the gris we just remove the second derivative (because we think that at the border volatility of state variables is zero). And we use forward/bacakward derivative
         if σi == 1
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] += - ∂σ
-            index = searchsortedfirst(rows, ij + μn)
-            Cvals[krange[index]] += + ∂σ
+            C[ij, ij] +=  - 0.5 * 3  * ∂σ
+            C[ij + μn, ij] += 0.5 * 4 * ∂σ
+            C[ij + 2 * μn, ij] += - 0.5 * ∂σ
+        elseif σi == σn
+            C[ij, ij] += 0.5 * 3 * ∂σ
+            C[ij - μn, ij] += - 0.5 * 4 * ∂σ
+            C[ij - 2 * μn, ij] += 0.5 * ∂σ
+        else
+            C[ij - μn, ij] += - ∂σ * 0.5 + ∂2σ
+            C[ij + μn, ij] += ∂σ * 0.5 + ∂2σ
+            C[ij, ij] += - 2 * ∂2σ
         end
-        if σi == σn
-            index = searchsortedfirst(rows, ij - μn)
-            Cvals[krange[index]] += - ∂σ
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] += + ∂σ
-        end
-        current = - byp.ρ * byp.θ + (1-byp.γ) * byp.μs[μi] - 0.5 * (1-byp.γ) * byp.γ * byp.νD^2 * byp.σs[σi]
-        index = searchsortedfirst(rows, ij)
-        Cvals[krange[index]] += current
+        C[ij, ij] += - byp.ρ * byp.θ + (1-byp.γ) * byp.μs[μi] - 0.5 * (1-byp.γ) * byp.γ * byp.νD^2 * byp.σs[σi]
     end
     return C
 end

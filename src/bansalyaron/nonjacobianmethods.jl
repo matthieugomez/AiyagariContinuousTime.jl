@@ -88,3 +88,22 @@ function solve(::Type{Val{:adiff}}, byp::BansalYaronProblem; kwargs...)
     out = nlsolve(df, oldV, method = :trust_region, show_trace = true)
     return out.zero
 end
+
+
+dμ=Interval(min(byp.μs),max(byp.μs))
+dσ=Interval(min(byp.σs),max(byp.σs))
+d = dμ * dσ
+Dμ=Derivative(d,1)
+Dσ=Derivative(d,2)
+
+D2μ=Derivative(d,2)
+D2σt=Derivative(d,2)
+
+;dt=Interval(0.0,.1)
+d=dx*dt
+
+V=Fun(x->x^2,dx)
+
+Dt=Derivative(d,2);Dx=Derivative(d,1)
+
+ϵ=1.
