@@ -18,8 +18,7 @@ include("aiyagari/aiyagari.jl")
 include("aiyagari/dynamicaiyagari.jl")
 
 include("bansalyaron/bansalyaronproblem.jl")
-include("bansalyaron/jacobianmethods.jl")
-include("bansalyaron/nonjacobianmethods.jl")
+include("bansalyaron/finitedifferences.jl")
 
 
 

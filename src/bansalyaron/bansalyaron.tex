@@ -37,31 +37,34 @@ We write $G_t = G(\mu, \sigma)$ and we get the PDE
 	&+ \kappa_{\mu}(\bar{\mu}-\mu)\frac{\partial G}{\partial\mu}+  \kappa_{\sigma}(1-\sigma)\frac{\partial G}{\partial\sigma}\\
 	&+\frac{1}{2}\nu_{\mu}^{2}\sigma\frac{\partial^{2}G}{\partial\mu^{2}}+\frac{1}{2}\nu_{\sigma}^{2}\sigma \frac{\partial^{2}G}{\partial\sigma^{2}}
 \end{align*}
-Boundary coundition  = reflectiving barrier
-\begin{align*}
-	\partial_\mu G(\underline{u}, \sigma) &= 0  \\
-	\partial_\mu G(\overline{u}, \sigma) &= 0 \\
-	\partial_\sigma G(u, \underline{\sigma}) &= 0  \\
-	\partial_\sigma G(u, \overline{\sigma}) &= 0 
-\end{align*}
-I think the best way to incorporate these boundary conditions is to adopt an upwinding scheme. The upwinding scheme says to approximate the first derivative by the forward difference when the drift of a state variable is positive, and by the backward difference when the drift of a state variable is negative.
+
+
+We solve this PDE on a grid using a Finite Difference Scheme. 
+
 \begin{align*}
 	0&= \rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]+G_{ij}((1-\gamma)\mu_i-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
-	&+\kappa_{\mu_i}(\bar{\mu}-\mu_i)^+\frac{G_{i+1, j}-G_{i, j}}{\Delta \mu} +\kappa_{\mu_i}(\bar{\mu}-\mu_i)^-\frac{G_{i, j}-G_{i-1, j}}{\Delta \mu}\\
-	&+\kappa_{\sigma_j}(1-\sigma_j)^+\frac{G_{i, j+1}-G_{i,j}}{\Delta \sigma} +\kappa_{\sigma_j}(1-\sigma_j)^-\frac{G_{i, j}-G_{i,j-1}}{\Delta \sigma}\\
+	&+\kappa_{\mu_i}(\bar{\mu}-\mu_i)\frac{G_{i+1, j}-G_{i+1, j}}{2\Delta \mu}\\
+	&+\kappa_{\sigma_j}(1-\sigma_j)\frac{G_{i, j+1}-G_{i,j-1}}{2\Delta \sigma}\\
 	&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j\frac{G_{i+1, j} - 2 G_{i, j} + G_{i-1, j}}{(\Delta\mu)^2}+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j\frac{G_{i, j+1} - 2 G_{i, j} + G_{i, j-1}}{(\Delta\sigma)^2}
 \end{align*}
 
-At the frontier of the state space, the second order derivative uses the value of $G$ at nodes not on the grid (``ghost nodes''): set the value of these nodes to the value of nodes at the frontier.
+At the border of the grid, we remove the second derivative term and we use a second order approximation for the first derivative. For instance at $i = 1$, the scheme is 
+
+\begin{align*}
+	0&= \rho \theta[(G_{1j})^{1-\frac{1}{\theta}}- G_{1j}]+G_{1j}((1-\gamma)\mu_1-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
+	&+\kappa_{\mu_1}(\bar{\mu}-\mu_1)\frac{-(3G_{0,j} - 4 G_{1,j} + G_{2,j})}{2\Delta \mu}\\
+	&+\kappa_{\sigma_j}(1-\sigma_j)\frac{G_{1, j+1}-G_{1,j-1}}{2\Delta \sigma}\\
+	&+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j\frac{G_{1, j+1} - 2 G_{1, j} + G_{1, j-1}}{(\Delta\sigma)^2}
+\end{align*}
 
 
-Denote $y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n})$. The scheme can be solved in two ways
+Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme can be written as $F(Y) = 0$. This can be solved in one of these two ways:
 \begin{itemize}
-	\item Use a non linear solver to solve $F(y) = 0$, using for instance the Powell or Newton methods. Both methods require to specify the Jacobian of $F$. 
-	\item Use a ODE solver to solve $F(y) = \dot{y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE. Some MATLAB solvers like \printt{ode23s} also accept  the Jacobian of $F$ as an imput. This makes the solution faster, but this requires to program a little bit more.
+	\item Use a non linear solver to solve $F(Y) = 0$
+	\item Use the method of line, which solves the system of PDE $F(Y) = \dot{Y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE.
 \end{itemize}
 
-Both methods require an initial guess. Use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
+Both methods require an initial guess. We use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
 			
 \subsection{Comparison}
 

@@ -40,35 +40,22 @@ Parameters from Bansal Yaron Kiku (2007)
 using HJBFiniteDifference, Gadfly
 byp = BansalYaronProblem(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
 
-# non linear solver: Newton method
-solution = solve(byp, method = :newton)
+
+# non linear solver
+solution = solve(byp, method = :nl)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
 
-# non linear solver : trust region method
-solution = solve(byp, method = :trust_region)
-plot(byp, solution, :s2)
-plot(byp, solution, :m)
 
-# non linear solver: trust region method with analytical diff
-solution = solve(byp, method = :adiff)
-plot(byp, solution, :s2)
-plot(byp, solution, :m)
-
-# ODE solver : 23s (use Jacobian)
-solution = solve(byp, method = :ode23s)
-plot(byp, solution, :s2)
-plot(byp, solution, :m)
-
-# ODE solver : 45
-solution = solve(byp, method = :ode45)
+# ODE solver
+solution = solve(byp, method = :ode)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
 
 
 ```
 
-![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byg.svg)
+![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp.svg)
 
 
 # Bibliography
