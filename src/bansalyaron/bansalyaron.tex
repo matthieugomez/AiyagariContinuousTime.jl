@@ -58,13 +58,13 @@ At the border of the grid, we remove the second derivative term and we use a sec
 \end{align*}
 
 
-Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme can be written as $F(Y) = 0$. This can be solved in one of these two ways:
+Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme can be written as $F(Y) = 0$. We can solve for $Y$ using one of these methods:
 \begin{itemize}
-	\item Use a non linear solver to solve $F(Y) = 0$
-	\item Use the method of line, which solves the system of PDE $F(Y) = \dot{Y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE.
+	\item Use a non linear solver for the system $F(Y) = 0$
+	\item Use an ODE solver for the system $F(Y) = \dot{Y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE. This method corresponds to the method of lines.
 \end{itemize}
 
-Both methods require an initial guess. We use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
+For the initial guess, we use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
 			
 \subsection{Comparison}
 
@@ -117,10 +117,6 @@ Bansal Yaron find
 	A1 &= \frac{1-\frac{1}{\psi}}{1-0.997 e^{-\kappa_\mu}}\\
 	A2 &= 0.5\theta\frac{(1 - \frac{1}{\psi})^2 + (A_1  0.997 \frac{\nu_\mu}{\nu_D})^2}{1-0.997e^{-\kappa_\sigma}}
 \end{align*}
-
-\section{Solving HJB}
-Suppose we have a function for the sdf
-$$\frac{\rho}{1-\frac{1}{\psi}}&=  -\frac{\rho^\psi}{1-\psi}\xi^{1-\psi}  +r_f + (\frac{\pi}{\gamma} - \frac{\gamma-1}{\gamma}\sigma^\xi)\pi +\mu_{\xi}-\frac{\gamma}{2}( (\frac{\pi}{\gamma} - \frac{\gamma-1}{\gamma}\sigma^\xi)^2 +\sigma^2_\xi -2(1-\gamma)(\frac{\pi}{\gamma} - \frac{\gamma-1}{\gamma}\sigma^\xi)\sigma_\xi)$$
 
 
 \end{document}
