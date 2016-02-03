@@ -85,23 +85,15 @@ function AiyagariProblem(π::Float64 = 1.0,
     ij = zero(Int)
     @inbounds for zi in 1:zn, ai in 1:an
         ij += 1
-        krange = nzrange(C, ij)
-        rows = Crows[krange]
-
         if zi > 1
-            current =  0.5 * σ2 * invdz^2
-            index = searchsortedfirst(rows, ij - an)
-            Cvals[krange[index]] += current
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            current = 0.5 * σ2 * invdz^2
+            C[ij - an, ij] += current
+            C[ij, ij] -= current
         end    
-        
         if zi < zn
             current = θ * (zmean - z[zi]) * invdz + 0.5 * σ2 * invdz^2
-            index = searchsortedfirst(rows, ij + an)
-            Cvals[krange[index]] += current
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
+            C[ij + an, ij] += current
+            C[ij, ij] -= current
         end
     end
 
@@ -170,10 +162,8 @@ function update_value!(ap::AiyagariProblem)
         if saving > 0 # case of positive drift
             if ai < an
                 current = saving * invda 
-                index = searchsortedfirst(rows, ij)
-                Avals[krange[index]] -= current
-                index = searchsortedfirst(rows, ij + 1)
-                Avals[krange[index]] += current
+                A[ij, ij] -= current
+                A[ij + 1, ij] += current
             end
         else
             if ai > 1
@@ -186,10 +176,8 @@ function update_value!(ap::AiyagariProblem)
             if saving < 0 # case of negative drift
                 if ai > 1
                     current = saving * invda 
-                    index = searchsortedfirst(rows, ij - 1)
-                    Avals[krange[index]] -= current
-                    index = searchsortedfirst(rows, ij)
-                    Avals[krange[index]] += current
+                    A[ij - 1, ij] -= current
+                    A[ij, ij] += current
                 end
             else
                 ∂V = (wz[zi] + ra[ai])^(-γ)

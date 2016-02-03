@@ -27,7 +27,8 @@ include("bansalyaron/finitedifferences.jl")
 ## Exported methods and types 
 ##
 ##############################################################################
-export solve,
+export solve!,
+solve,
 AiyagariProblem,
 DynamicAiyagariProblem,
 BansalYaronProblem,
