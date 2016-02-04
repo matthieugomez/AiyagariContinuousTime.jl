@@ -39,7 +39,9 @@ We write $G_t = G(\mu, \sigma)$ and we get the PDE
 \end{align*}
 
 
-We solve this PDE on a grid using a Finite Difference Scheme. 
+\subsubsection{Finite Difference Method}
+			
+We can discretize this PDE on a grid using a Finite Difference Scheme. 
 
 \begin{align*}
 	0&= \rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]+G_{ij}((1-\gamma)\mu_i-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
@@ -66,6 +68,12 @@ Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme can be writt
 
 For the initial guess, we use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
 			
+\subsubsection{Spectral Method (= collocation method)}
+Another way to solve the PDE is to look for a solution of the form
+$$V(\mu, \sigma) = \sum a_{ij} \phi_i(\mu)\psi_j(\sigma)$$
+where $\phi, \psi$ denote any basis of functions (splines or chebyshev polynomials).
+The value function is characterized by its coordinates $a_{ij}$ on this basis. Writing the PDE on a set of points gives a non linear system in term of the coordinates. This system can be solved by a non linear system.
+
 \subsection{Comparison}
 
 \begin{tabular}{|c|c|c|c|c|c|}
