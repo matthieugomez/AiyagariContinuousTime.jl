@@ -38,9 +38,7 @@ We write $G_t = G(\mu, \sigma)$ and we get the PDE
 	&+\frac{1}{2}\nu_{\mu}^{2}\sigma\frac{\partial^{2}G}{\partial\mu^{2}}+\frac{1}{2}\nu_{\sigma}^{2}\sigma \frac{\partial^{2}G}{\partial\sigma^{2}}
 \end{align*}
 
-
 \subsubsection{Finite Difference Method}
-			
 We can discretize this PDE on a grid using a Finite Difference Scheme. 
 
 \begin{align*}
@@ -49,7 +47,6 @@ We can discretize this PDE on a grid using a Finite Difference Scheme.
 	&+\kappa_{\sigma_j}(1-\sigma_j)\frac{G_{i, j+1}-G_{i,j-1}}{2\Delta \sigma}\\
 	&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j\frac{G_{i+1, j} - 2 G_{i, j} + G_{i-1, j}}{(\Delta\mu)^2}+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j\frac{G_{i, j+1} - 2 G_{i, j} + G_{i, j-1}}{(\Delta\sigma)^2}
 \end{align*}
-
 At the border of the grid, we remove the second derivative term and we use a second order approximation for the first derivative. For instance at $i = 1$, the scheme is 
 
 \begin{align*}
@@ -58,21 +55,21 @@ At the border of the grid, we remove the second derivative term and we use a sec
 	&+\kappa_{\sigma_j}(1-\sigma_j)\frac{G_{1, j+1}-G_{1,j-1}}{2\Delta \sigma}\\
 	&+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j\frac{G_{1, j+1} - 2 G_{1, j} + G_{1, j-1}}{(\Delta\sigma)^2}
 \end{align*}
-
-
-Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme can be written as $F(Y) = 0$. We can solve for $Y$ using one of these methods:
-\begin{itemize}
+Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme  defines a function $F$ such that $F(Y) = 0$. We can solve for $Y$ using one of these methods:
+\begin{enumerate}
 	\item Use a non linear solver for the system $F(Y) = 0$
 	\item Use an ODE solver for the system $F(Y) = \dot{Y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE. This method corresponds to the method of lines.
-\end{itemize}
-
+	\item A solution that would \textit{not} work is to solve for $G$ by iterating over time:
+	$$\frac{G_{n+1}-G_n}{\Delta t} = F(G_n)$$
+	This method can be seen as a special case of a non linear solver (in this context, it is called the Newton Method) or as a special case of an ODE solver (in this context, it is called the Euler method). The criterion for the convergence of this scheme is that $F$ is monotonous in $G$ (Barles Souganadis theorem). This is not the case here, due to the non linear term  $\rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]$
+\end{enumerate}
 For the initial guess, we use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
-			
+
 \subsubsection{Spectral Method (= collocation method)}
 Another way to solve the PDE is to look for a solution of the form
-$$V(\mu, \sigma) = \sum a_{ij} \phi_i(\mu)\psi_j(\sigma)$$
+$$V(\mu, \sigma) = \sum_{kl} a_{kl} \phi_k(\mu)\psi_l(\sigma)$$
 where $\phi, \psi$ denote any basis of functions (splines or chebyshev polynomials).
-The value function is characterized by its coordinates $a_{ij}$ on this basis. Writing the PDE on a set of points gives a non linear system in term of the coordinates. This system can be solved by a non linear system.
+The value function is characterized by its coordinates $a_{kl}$ on this basis. Writing the PDE on a set of points gives a non linear system in term of the coordinates. Compared to the Finite Difference method, the non linear system solves for $a_{kl}$ rather than $V_{ij}$. We use the same border condition and initial guess as the Finite Difference method.
 
 \subsection{Comparison}
 
@@ -111,8 +108,6 @@ The value function is characterized by its coordinates $a_{ij}$ on this basis. W
 	\hline
 \end{tabular}
 Also,  $\theta = (1-\gamma)/(1- 1/\psi)$ = -19.50 or -27.
-
-
 Let's express the  wealth to consumption ratio $K_t$ in term of state variables.
 $$V = G_tK_t^{\gamma - 1}\frac{W^{1-\gamma}}{(1-\gamma)}$$
 FOC for consumption can be written
@@ -125,6 +120,4 @@ Bansal Yaron find
 	A1 &= \frac{1-\frac{1}{\psi}}{1-0.997 e^{-\kappa_\mu}}\\
 	A2 &= 0.5\theta\frac{(1 - \frac{1}{\psi})^2 + (A_1  0.997 \frac{\nu_\mu}{\nu_D})^2}{1-0.997e^{-\kappa_\sigma}}
 \end{align*}
-
-
 \end{document}
