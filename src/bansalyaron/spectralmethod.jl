@@ -56,12 +56,8 @@ end
 function solve(::Type{Val{:spectral}}, byp::BansalYaronProblem; iterations = 50, kwargs...)
     μmin = byp.μ - 6 * byp.νμ / sqrt(2*byp.κμ)
     μmax = byp.μ + 6 * byp.νμ / sqrt(2*byp.κμ)
-    σmin = 1.0 - 3 * byp.νσ / sqrt(2*byp.κσ)
-    σmax = 1.0 + 3 * byp.νσ / sqrt(2*byp.κσ)
-    if σmin < 0
-        σmin = 1e-3
-        σmax = 2.0
-    end
+    σmin = 0.0
+    σmax = 3.0
     basisμ = Basis(Cheb, 20, μmin, μmax)
     basisσ = Basis(Cheb, 20, σmin, σmax)
     basis = Basis(basisμ, basisσ)

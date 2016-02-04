@@ -22,14 +22,9 @@ function BansalYaronFDMethod(byp::BansalYaronProblem; μn = 50, σn = 50)
     μmax = byp.μ + 6 * byp.νμ / sqrt(2*byp.κμ)
     μs = collect(linspace(μmin, μmax, μn))
     invdμ = (μn - 1)/(μmax - μmin)
-
-    # create volatility +-3 sd otherwise negative volatility
-    σmin = 1.0 - 3 * byp.νσ / sqrt(2*byp.κσ)
-    σmax = 1.0 + 3 * byp.νσ / sqrt(2*byp.κσ)
-    if σmin < 0
-        σmin = 1e-3
-        σmax = 2.0
-    end
+  
+    σmin = 0.0
+    σmax = 3.0
     σs = collect(linspace(σmin, σmax, σn))
     invdσ = (σn - 1)/(σmax - σmin)
 
@@ -65,23 +60,23 @@ function F!{T}(byfd::BansalYaronFDMethod, y::Vector{T}, ydot::Vector{T})
         V = fy[μi, σi]
         V∂σ = zero(T)
         V∂2σ = zero(T)
-        if  (σi > 1) & (σi < σn)
-            V∂2σ = (fy[μi, σi+1] + fy[μi, σi-1] - 2.0 * fy[μi, σi]) * byfd.invdσ^2
-            V∂σ = 0.5 * (fy[μi, σi+1] - fy[μi, σi-1]) * byfd.invdσ
-        elseif σi == 1
+        if σi == 1
             V∂σ = - 0.5 * (3 * fy[μi, σi] - 4 * fy[μi, σi+1] + fy[μi, σi+2]) * byfd.invdσ
         elseif σi == σn
             V∂σ = 0.5 * (3 * fy[μi, σi] - 4 * fy[μi, σi-1] + fy[μi, σi-2]) * byfd.invdσ
+        else
+            V∂2σ = (fy[μi, σi+1] + fy[μi, σi-1] - 2.0 * fy[μi, σi]) * byfd.invdσ^2
+            V∂σ = 0.5 * (fy[μi, σi+1] - fy[μi, σi-1]) * byfd.invdσ
         end
         V∂μ = zero(T)
         V∂2μ = zero(T)
-        if  (μi > 1) & (μi < μn)
-            V∂2μ = (fy[μi+1, σi] + fy[μi-1, σi] - 2.0 * fy[μi, σi]) * byfd.invdμ^2
-            V∂μ = 0.5 * (fy[μi+1, σi] - fy[μi-1, σi]) * byfd.invdμ
-        elseif μi == 1
+        if μi == 1
             V∂μ = - 0.5 * (3 * fy[μi, σi] - 4 * fy[μi+1, σi] + fy[μi+2, σi]) * byfd.invdμ
         elseif μi == μn
             V∂μ = 0.5 * (3 * fy[μi, σi] - 4 * fy[μi-1, σi] + fy[μi-2, σi]) * byfd.invdμ
+        else
+            V∂2μ = (fy[μi+1, σi] + fy[μi-1, σi] - 2.0 * fy[μi, σi]) * byfd.invdμ^2
+            V∂μ = 0.5 * (fy[μi+1, σi] - fy[μi-1, σi]) * byfd.invdμ
         end
         ydot[ij] = (byp.ρ * byp.θ * max(V, 0.0)^(1-1/byp.θ)
                     + (- byp.ρ * byp.θ + (1-byp.γ) * μs[μi] - 0.5 * (1-byp.γ) * byp.γ * byp.νD^2 * σs[σi]) * V

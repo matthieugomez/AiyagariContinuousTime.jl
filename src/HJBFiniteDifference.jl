@@ -14,7 +14,8 @@ using CompEcon
 ##
 ##############################################################################
 include("aiyagari/aiyagari.jl")
-include("aiyagari/dynamicaiyagari.jl")
+include("aiyagari/aiyagarisimple.jl")
+
 
 include("bansalyaron/bansalyaronproblem.jl")
 include("bansalyaron/finitedifferences.jl")
@@ -30,6 +31,9 @@ include("bansalyaron/spectralmethod.jl")
 export solve!,
 solve,
 AiyagariProblem,
+AiyagariMethod,
+AiyagariFD,
+AiyagariSimple,
 DynamicAiyagariProblem,
 BansalYaronProblem,
 plot_ll
