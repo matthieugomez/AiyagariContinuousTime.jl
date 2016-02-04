@@ -3,11 +3,10 @@ module HJBFiniteDifference
 
 import DataFrames: DataFrame
 import Gadfly: plot, Geom
-import NLsolve: nlsolve, DifferentiableGivenSparseMultivariateFunction, DifferentiableMultivariateFunction
+import NLsolve: nlsolve
 import Distances: chebyshev
 using ODE
-using Sundials
-using ForwardDiff
+using CompEcon
 
 ##############################################################################
 ##
@@ -19,6 +18,7 @@ include("aiyagari/dynamicaiyagari.jl")
 
 include("bansalyaron/bansalyaronproblem.jl")
 include("bansalyaron/finitedifferences.jl")
+include("bansalyaron/spectralmethod.jl")
 
 
 
