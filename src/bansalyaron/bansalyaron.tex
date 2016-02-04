@@ -58,10 +58,10 @@ At the border of the grid, we remove the second derivative term and we use a sec
 Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme  defines a function $F$ such that $F(Y) = 0$. We can solve for $Y$ using one of these methods:
 \begin{enumerate}
 	\item Use a non linear solver for the system $F(Y) = 0$
-	\item Use an ODE solver for the system $F(Y) = \dot{Y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE. This method corresponds to the method of lines.
+	\item Use an ODE solver for the system $F(Y) = \dot{Y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE. This method is called ``the method of lines''.
 	\item A solution that would \textit{not} work is to solve for $G$ by iterating over time:
 	$$\frac{G_{n+1}-G_n}{\Delta t} = F(G_n)$$
-	This method can be seen as a special case of a non linear solver (in this context, it is called the Newton Method) or as a special case of an ODE solver (in this context, it is called the Euler method). The criterion for the convergence of this scheme is that $F$ is monotonous in $G$ (Barles Souganadis theorem). This is not the case here, due to the non linear term  $\rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]$
+	This method can be seen as a special case of a non linear solver (in this context, it is called the Newton Method) or as a special case of an ODE solver (in this context, it is called the Euler method). The criterion for the convergence of such a method is that $F$ is monotonous in $G$ (Barles Souganadis theorem). This is not the case here, due to the non linear term  $\rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]$
 \end{enumerate}
 For the initial guess, we use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
 
