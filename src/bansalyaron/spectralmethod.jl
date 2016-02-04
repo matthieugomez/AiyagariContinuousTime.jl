@@ -47,7 +47,6 @@ end
 
 function solve(::Type{Val{:spectral}}, byp::BansalYaronProblem, μs, σs,  bs::Matrix{Float64}, bs∂μ::Matrix{Float64}, bs∂σ::Matrix{Float64}, bs∂2μ::Matrix{Float64}, bs∂2σ::Matrix{Float64}, oldV; kwargs...)
     out = nlsolve((y, ydot) -> F!(byp, μs, σs,  bs, bs∂μ, bs∂σ, bs∂2μ, bs∂2σ, y, ydot), oldV; method = :trust_region, show_trace = true, kwargs...)
-    @show out.zero
     V = bs' * out.zero
     return μs, σs, V
 end

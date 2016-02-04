@@ -34,7 +34,7 @@ plot(x = collect(1:length(π)), y = apd.K, Geom.line)
 
 # Bansal Yaron
 
-The package solves the PDE corresponding to the long run risk model of Bansal-Yaron (2004). The choice of parameters follows Bansal-Yaron- Kiku (2007). While this model is generally solved by log-linearization, the solution of the PDE is non linear in volatility. 
+The package solves the PDE associated with the long run risk model of Bansal-Yaron (2004). This long run risk model is generally solved by log-linearization, which assumes that the price dividend is linear in state variables. Solving directly the PDE shows that the price-dividend actually displays substantial non linearity wrt volatility. The choice of parameters follows Bansal-Yaron- Kiku (2007).
 
 
 ```julia
