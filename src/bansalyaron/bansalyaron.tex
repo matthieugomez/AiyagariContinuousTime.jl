@@ -50,7 +50,7 @@ We can discretize this PDE on a grid using a Finite Difference Scheme.
 \end{align*}
 
 
-At the border of the grid, we remove the second derivative term and we use a second order approximation for the first derivative\footnote{A different boundary coundition would be to assume that $\mu$ and $\sigma$ are reflecting processes. In this case, the first derivative of $G$ is null at the border}. For instance at $i = 1$, the scheme is 
+At the border of the grid, we remove the second derivative term and we use a second order approximation for the first derivative\footnote{A different boundary coundition would be to assume that $\mu$ and $\sigma$ are reflecting processes. In this case, the first derivative of $G$ is null at the border.}. For instance at $i = 1$, the scheme is 
 $$\frac{G_{0, j}-G_{2,j}}{2} == 0$$
 \begin{align*}
 	0&= \rho \theta[(G_{1j})^{1-\frac{1}{\theta}}- G_{1j}]+G_{1j}((1-\gamma)\mu_1-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\

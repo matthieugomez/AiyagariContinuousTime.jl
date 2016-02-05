@@ -14,7 +14,7 @@ using CompEcon
 ##
 ##############################################################################
 include("aiyagari/aiyagari.jl")
-include("aiyagari/aiyagarisimple.jl")
+include("aiyagari/dynamicaiyagari.jl")
 
 
 include("bansalyaron/bansalyaronproblem.jl")
