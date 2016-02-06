@@ -1,6 +1,7 @@
 module HJBFiniteDifference
 
-
+import Distributions: Gamma, Normal
+import StatsBase: denserank
 import DataFrames: DataFrame
 import Gadfly: plot, Geom
 import NLsolve: nlsolve

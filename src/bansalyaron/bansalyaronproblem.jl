@@ -50,12 +50,24 @@ function plot(byp::BansalYaronProblem, solution, symbol::Symbol)
     m = repeat(μs, outer = [length(σs)])
     s2 = repeat(byp.νD^2 * σs, inner = [length(μs)])
     df = DataFrame(wealthconsumption = pd, drift = m, volatility = s2)
+
+    σ = sqrt(byp.νμ^2 / (2 * byp.κμ))
+    μmin = quantile(Normal(byp.μ, σ), 0.01)
+    μmax = quantile(Normal(byp.μ, σ), 0.99)
+
+    α =  2 * byp.κσ / byp.νσ^2
+    σmin = quantile(Gamma(α, α), 0.01)
+    σmax = quantile(Gamma(α, α), 0.99)
+    df = df[(df[:volatility] .> byp.νD^2 * σmin) & (df[:volatility] .< byp.νD^2 * σmax), :]
+    df = df[(df[:drift] .> μmin) & (df[:drift] .< μmax), :]
     if symbol == :s2
-        df = df[df[:, :volatility] .< 0.00010, :]
-        condition = find((df[:drift] .== μs[1]) | (df[:drift] .== μs[div(length(μs), 2)]) | (df[:drift] .== μs[end]))
+        rank = denserank(df[:drift])
+        condition = (rank .== 1) | (rank .== maximum(rank)) | (rank .== div(maximum(rank), 2))
+        convert(Vector{Bool}, map(x -> isapprox(x, minimum(df[:drift])) | isapprox(x, median(df[:drift])) | isapprox(x, maximum(df[:drift])), df[:drift]))
         plot(df[condition, :], x = "volatility", y = "wealthconsumption", color = "drift", Geom.line)
     elseif symbol == :m
-        condition = find((df[:volatility] .== byp.νD^2 * σs[1]) | (df[:volatility] .== byp.νD^2 * σs[div(length(σs), 2)]) | (df[:volatility] .== byp.νD^2 * σs[end]))
+        rank = denserank(df[:volatility])
+        condition = (rank .== 1) | (rank .== maximum(rank)) | (rank .== div(maximum(rank), 2))
         plot(df[condition, :], x = "drift", y = "wealthconsumption", color = "volatility", Geom.line)
     end
 end

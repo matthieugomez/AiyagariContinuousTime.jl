@@ -56,8 +56,8 @@ solution = solve(byp, method = :spectral)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
 ```
-
-![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp.svg)
+![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp_drift.svg)
+![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp_volatility.svg)
 
 
 # Bibliography

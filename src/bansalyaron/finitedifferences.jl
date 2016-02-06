@@ -16,22 +16,26 @@ type BansalYaronFDMethod
     σs::Vector{Float64}
 end
 
-function BansalYaronFDMethod(byp::BansalYaronProblem; μn = 50, σn = 50)
-    # create drift grid +-3 sd of stationary distribution
-    μmin = byp.μ - 6 * byp.νμ / sqrt(2*byp.κμ)
-    μmax = byp.μ + 6 * byp.νμ / sqrt(2*byp.κμ)
-    μs = collect(linspace(μmin, μmax, μn))
-    invdμ = (μn - 1)/(μmax - μmin)
-  
+function BansalYaronFDMethod(byp::BansalYaronProblem; μn = 30, σn = 50)
+
+    # create volatility grid. square root process has stationary Gamma distribution
     σmin = 0.0
-    σmax = 3.0
+    α =  2 * byp.κσ / byp.νσ^2
+    σmax = quantile(Gamma(α, α), 0.999)
     σs = collect(linspace(σmin, σmax, σn))
     invdσ = (σn - 1)/(σmax - σmin)
+
+    # create drift grid
+    σ = sqrt(byp.νμ^2 / (2 * byp.κμ))
+    μmin = quantile(Normal(byp.μ, σ), 0.001)
+    μmax = quantile(Normal(byp.μ, σ), 0.999)
+    μs = collect(linspace(μmin, μmax, μn))
+    invdμ = (μn - 1)/(μmax - μmin)
 
     BansalYaronFDMethod(byp, invdμ, invdσ, μs, σs)
 end
 
-function solve(x::Union{Type{Val{:ode}}, Type{Val{:nl}}}, byp::BansalYaronProblem; μn = 50, σn = 50,  kwargs...)
+function solve(x::Union{Type{Val{:ode}}, Type{Val{:nl}}}, byp::BansalYaronProblem; μn = 30, σn = 50,  kwargs...)
     byfd = BansalYaronFDMethod(byp, μn = μn, σn = σn)
     solution = solve(x, byfd, kwargs...)
     return byfd.μs, byfd.σs, solution
@@ -60,25 +64,34 @@ function F!{T}(byfd::BansalYaronFDMethod, y::Vector{T}, ydot::Vector{T})
         V = fy[μi, σi]
         V∂σ = zero(T)
         V∂2σ = zero(T)
-        if σi == 1
-            V∂σ = - 0.5 * (3 * fy[μi, σi] - 4 * fy[μi, σi+1] + fy[μi, σi+2]) * byfd.invdσ
-        elseif σi == σn
-            V∂σ = 0.5 * (3 * fy[μi, σi] - 4 * fy[μi, σi-1] + fy[μi, σi-2]) * byfd.invdσ
+        if (byp.κσ * (1.0 - σs[σi])) >= 0
+            V∂σ = (fy[μi, σi+1] - fy[μi, σi]) * byfd.invdσ
         else
-            V∂2σ = (fy[μi, σi+1] + fy[μi, σi-1] - 2.0 * fy[μi, σi]) * byfd.invdσ^2
-            V∂σ = 0.5 * (fy[μi, σi+1] - fy[μi, σi-1]) * byfd.invdσ
+            V∂σ = (fy[μi, σi] - fy[μi, σi-1]) * byfd.invdσ
+        end
+        if σi == 1
+            # does not matter since volatility == 0
+            V∂2σ = zero(T)
+        elseif σi == σn
+            V∂2σ = (fy[μi, σi-1] - fy[μi, σi]) * byfd.invdσ^2
+        else
+            V∂2σ = (fy[μi, σi+1] + fy[μi, σi-1] - 2 * fy[μi, σi]) * byfd.invdσ^2
         end
         V∂μ = zero(T)
         V∂2μ = zero(T)
-        if μi == 1
-            V∂μ = - 0.5 * (3 * fy[μi, σi] - 4 * fy[μi+1, σi] + fy[μi+2, σi]) * byfd.invdμ
-        elseif μi == μn
-            V∂μ = 0.5 * (3 * fy[μi, σi] - 4 * fy[μi-1, σi] + fy[μi-2, σi]) * byfd.invdμ
+        if (byp.κμ * (byp.μ - μs[μi])) >= 0
+            V∂μ = (fy[μi+1, σi] - fy[μi, σi]) * byfd.invdμ
         else
-            V∂2μ = (fy[μi+1, σi] + fy[μi-1, σi] - 2.0 * fy[μi, σi]) * byfd.invdμ^2
-            V∂μ = 0.5 * (fy[μi+1, σi] - fy[μi-1, σi]) * byfd.invdμ
+            V∂μ = (fy[μi, σi] - fy[μi-1, σi]) * byfd.invdμ
         end
-        ydot[ij] = (byp.ρ * byp.θ * max(V, 0.0)^(1-1/byp.θ)
+        if μi == 1
+            V∂2μ = (fy[μi+1, σi] - fy[μi, σi]) * byfd.invdμ^2
+        elseif μi == μn
+            V∂2μ = (fy[μi-1, σi] - fy[μi, σi]) * byfd.invdμ^2
+        else
+            V∂2μ = (fy[μi+1, σi] + fy[μi-1, σi] - 2 * fy[μi, σi]) * byfd.invdμ^2
+        end
+        ydot[ij] = (byp.ρ * byp.θ * max(V, zero(T))^(1-1/byp.θ)
                     + (- byp.ρ * byp.θ + (1-byp.γ) * μs[μi] - 0.5 * (1-byp.γ) * byp.γ * byp.νD^2 * σs[σi]) * V
                     + (byp.κμ * (byp.μ - μs[μi])) * V∂μ 
                     + (byp.κσ * (1.0 - σs[σi])) * V∂σ 
