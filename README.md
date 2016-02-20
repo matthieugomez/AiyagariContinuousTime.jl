@@ -6,19 +6,21 @@ Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 # Aiyagari
 - The package solves the Aiyagari model following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
 ```julia
+using HJBFiniteDifference
 # solve a static equilibrium
-using HJBFiniteDifference, Gadfly
 ap = AiyagariProblem(π = 0.0);
-# steady state
-@time solve(ap)
+as = solve(ap)
 ```
 - The package solves a dynamic version of the Aiyagri model following Ahn, Kaplan, Moll, Winberry (Forthcoming)
 
 ```julia
-# dynamics
-ρπ = 0.9
-σπ = 0.1
-@time solve(ap, ρπ, σπ)
+using HJBFiniteDifference, Gadfly
+ap = AiyagariProblem(π = 0.0);
+ρπ = 0.95
+σπ = 0.007
+as = solve(ap, ρπ, σπ)
+time, V, g, K, r, w = simulate(ap, as)
+plot(x = time, y = r, Geom.line,  Guide.xlabel("Years"), Guide.ylabel("Percentage points"), Guide.title("Interest Rate to Aggregate Productivity Shock"))
 ```
 
 

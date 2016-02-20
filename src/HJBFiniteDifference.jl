@@ -17,7 +17,7 @@ using CompEcon
 ##############################################################################
 include("aiyagari/aiyagari.jl")
 include("aiyagari/dynamicaiyagari.jl")
-include("aiyagari/phact_solver.jl")
+include("aiyagari/gensys.jl")
 
 include("bansalyaron/bansalyaronproblem.jl")
 include("bansalyaron/finitedifferences.jl")
@@ -31,10 +31,11 @@ include("bansalyaron/spectralmethod.jl")
 ##
 ##############################################################################
 export solve,
+simulate,
 AiyagariProblem,
 AiyagariArrays,
 AiyagariSolution,
-AiyagariMethod,
+DynamicAiyagariSolution,
 BansalYaronProblem,
 plot_ll
 #phact_solver
