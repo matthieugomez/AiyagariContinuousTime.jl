@@ -22,6 +22,7 @@ as = solve(ap, ρπ, σπ)
 time, V, g, K, r, w = simulate(ap, as)
 plot(x = time, y = r, Geom.line,  Guide.xlabel("Years"), Guide.ylabel("Percentage points"), Guide.title("Interest Rate to Aggregate Productivity Shock"))
 ```
+![aiyagari](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/aiyagari.svg)
 
 
 # Bansal Yaron
