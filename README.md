@@ -4,22 +4,22 @@ Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 ```
 
 # Aiyagari
-The solution for the steady state follows Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
-The solution for the dynamics follows the solution method of Ahn, Kaplan, Moll, Winberry (Forthcoming)
-
+- The package solves the Aiyagari model following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
 ```julia
 # solve a static equilibrium
 using HJBFiniteDifference, Gadfly
 ap = AiyagariProblem(π = 0.0);
 # steady state
 @time solve(ap)
+```
+- The package solves a dynamic version of the Aiyagri model following Ahn, Kaplan, Moll, Winberry (Forthcoming)
+
+```julia
 # dynamics
 ρπ = 0.9
 σπ = 0.1
 @time solve(ap, ρπ, σπ)
 ```
-
-![aiyagari](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/aiyagari.svg)
 
 
 # Bansal Yaron
