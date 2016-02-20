@@ -37,7 +37,11 @@ We write $G_t = G(\mu, \sigma)$ and we get the PDE
 	&+ \kappa_{\mu}(\bar{\mu}-\mu)\frac{\partial G}{\partial\mu}+  \kappa_{\sigma}(1-\sigma)\frac{\partial G}{\partial\sigma}\\
 	&+\frac{1}{2}\nu_{\mu}^{2}\sigma\frac{\partial^{2}G}{\partial\mu^{2}}+\frac{1}{2}\nu_{\sigma}^{2}\sigma \frac{\partial^{2}G}{\partial\sigma^{2}}
 \end{align*}
-
+\subsubsection{Log linearization method}
+We guess $G = e^{A_0+ A_1\mu_t + A_2 \sigma_t}$ and linearize the non linear term in $G$ 
+$$G^{-\frac{1}{\theta}} \approx e^{-\frac{1}{\theta}(A_0 + A_1 \overline{\mu} + A_2)}(1-\frac{1}{\theta}(A_1(\mu_t -\overline{\mu}) + A_2 (\sigma_t-1))$$
+	
+We can then solve for $A_0, A_1, A_2$ by setting the constant term, the term in $\mu_t$ and the term in $\sigma_t$ to zero in the linearized PDE.
 \subsubsection{Finite Difference Method}
 We can discretize this PDE on a grid using a Finite Difference Scheme. 
 We assume that the processes associated with state variables have reflecting boundaries at the borders (except at the LHS border for $\sigma$). This gives a supplementary condition of the form $\partial G = 0$ at the borders\footnote{At the frontier we have
@@ -45,7 +49,7 @@ $$dG_{t} = G'(x) \sigma(x) \sqrt{dt} + G'(x)\mu(x) dt + \frac{1}{2}G''(x)\sigma^
 Since $dG_t$ is $O(dt)$, we must have $G'(x) = 0$, at least when $\sigma(x) \neq 0$.}
 
 
-To handle boundary conditions, we upwind the first derivative. This means that we approximate $\partial G$ by a forward difference when the drift is positive and a backward difference when the drift is negative. The main advantage here is that at the frontier, the first derivative does not involve points outside the grid. The second derivative still does. We find the value of $G$ at these points by applying the reflecting boundary condition there \footnote{At the points $j = 0$, the volatility is zero. Although we don't have the border condition $\partial_\sigma G = 0$ or $\partial_\mu G = 0$ anymore, the term involving the second derivative disappears naturally}
+To handle boundary conditions, we upwind the first derivative. This means that we approximate $\partial G$ by a forward difference when the drift is positive and a backward difference when the drift is negative. The second derivative at the border involves points outside the grid. We find the value of $G$ at these points by applying the reflecting boundary condition at these points. \footnote{At the points $j = 0$, the volatility is zero. Although we don't have the border condition $\partial_\sigma G = 0$ or $\partial_\mu G = 0$ anymore, the term involving the second derivative disappears naturally}
 
 
 To sum up the scheme is 
@@ -58,17 +62,16 @@ To sum up the scheme is
 
 Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme  defines a function $F$ such that $F(Y) = 0$. We can solve for $Y$ using one of these methods:
 \begin{enumerate}
-	\item Use a non linear solver for the system $F(Y) = 0$
+	\item Use a non linear solver for the system $F(Y) = 0$. These algorithms start with an initial guess, and update based on the Jacobian of $F$. In some PDE (not this one), you need a good initial guess. A technique is to solve the PDE for $\theta = 1$, and use the solution at an initial guess for other values of $\theta$.
 	\item Use an ODE solver for the system $F(Y) = \dot{Y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE. This method is called ``the method of lines''.
 \end{enumerate}
-Both methods require the jacobian of $F$, which can be automatically computed using automatic differenciation or numerical differenciation.
+Both methods require the jacobian of $F$, which can generally be automatically computed using automatic or numerical differenciation. 
 
 A solution that would \textit{not} work is to solve for $G$ by iterating over time
 \begin{align*}
 	\frac{G_{n+1}-G_n}{\Delta t} &= F(G_n)
 \end{align*}
-This method can be seen as a special case of a non linear solver (fixed point method) or as a special case of an ODE solver (in this context, it is called the Euler method). The criterion for the convergence of this method is that $F$ is monotonous in $G$ (Barles Souganadis theorem). This is not the case here, due to the non linear term  $\rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]$
-For the initial guess, we use the value function for the stationary problem $\sigma = 1$ and $\mu = \overline{\mu}$
+This method can be seen as a special case of a non linear solver (fixed point method) or as a special case of an ODE solver (in this context, it is called the Euler method). The criterion for the convergence of this method is that $F$ is monotonous in $G$ (Barles Souganadis theorem). This is not the case here, due to the non linear term  $\rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]$.
 
 \subsubsection{Spectral Method (= collocation method)}
 We can also solve the PDE by looking at solutions of the form

@@ -1,183 +1,93 @@
-#  Achdou, Han, Lasry, Lions, Moll (2015)
-#  Heterogeneous Agent Models in Continuous Time
+using HJBFiniteDifference, ForwardDiff, Gadfly
+
 
 ##############################################################################
 ##
-## Type 
+## F
 ##
 ##############################################################################
 
-type DynamicAiyagariProblem
-    ap::AiyagariProblem 
-    π::Vector{Float64}               # productivity across time
-    K::Vector{Float64}               # capital across time
-    Vend::Vector{Float64}            # value function at the end
-    gg::Vector{Vector{Float64}}      # distribution. gg[1] is initial condition.
-    A::Vector{Base.SparseMatrix.SparseMatrixCSC{Float64, Int}} # A matrix across time
-    N::Int                           # Number of periods
-    dt::Float64
-end
-
-##############################################################################
-##
-## Constructor
-##
-##############################################################################
-
-# Construct an instance of the tyoe if initial values for K is a number
-function DynamicAiyagariProblem(
-    π::Vector{Float64}, 
-    K::Float64; 
-    dt::Float64 = 0.5, 
-    γ::Float64 = 2.0, 
-    α::Float64 = 0.35, 
-    δ::Float64 = 0.1, 
-    ρ::Float64 = 0.05, 
-    σ2::Float64 = (0.10)^2,  
-    θ::Float64 = 0.3,
-    zmean::Float64 = 1.0,      
-    zn::Int = 40, 
-    zmin::Float64 = 0.5, 
-    zmax::Float64 = 1.5, 
-    amin::Float64 = -1.0, 
-    amax::Float64 = 30.0, 
-    an::Int = 100, 
-    invΔ::Float64 = 1e-3, 
-    relax::Float64 = 0.99)
-
-    # initialize path K by solving stationary model at every π
-    ap = AiyagariProblem(π[1], K, γ = γ, α = α, δ = δ, ρ = ρ, σ2 = σ2, θ = θ, zmean = zmean, zn = zn, zmin = zmin, zmax = zmax, amin = amin, amax = amax, an = an, invΔ = invΔ)
-    N = length(π)
-    Ks = Array(Float64, N)
-    N0 = floor(Int, N/10)
-
-    for n in 1:N0
-        ap.π = π[n]
-        if n > 1
-            ap.K = Ks[n-1]
-        end
-        solve!(ap, relax = relax, verbose = false)
-        Ks[n] = ap.K
-    end
-    for n in (N0+1):N
-        Ks[n] = ap.K
-    end
-
-    DynamicAiyagariProblem(π, Ks, dt = dt, γ = γ, α = α, δ = δ, ρ = ρ, σ2 = σ2, θ = θ, zmean = zmean, zn = zn, zmin = zmin, zmax = zmax, amin = amin, amax = amax, an = an, invΔ = invΔ, relax = relax)
-end
-
-# Construct an instance of the tyoe if initial values for K is a vector
-# K[t] should value of stationary equilibrium π[t]
-function  DynamicAiyagariProblem(
-    π::Vector{Float64}, 
-    K::Vector{Float64}; 
-    dt::Float64 = 0.5, 
-    γ::Float64 = 2.0, 
-    α::Float64 = 0.35, 
-    δ::Float64 = 0.1, 
-    ρ::Float64 = 0.05, 
-    σ2::Float64 = (0.10)^2,  
-    θ::Float64 = 0.3,
-    zmean::Float64 = 1.0,    
-    zn::Int = 40, 
-    zmin::Float64 = 0.5, 
-    zmax::Float64 = 1.5, 
-    amin::Float64 = -1.0, 
-    amax::Float64 = 30.0, 
-    an::Int = 100,
-    invΔ::Float64 = 1e-3, 
-    relax::Float64 = 0.99)
-
-    ap = AiyagariProblem(π[end], K[end], γ = γ, α = α, δ = δ, ρ = ρ, σ2 = σ2, θ = θ, zmean = zmean, zn = zn, zmin = zmin, zmax = zmax, amin = amin, amax = amax, an = an, invΔ = invΔ)
-    solve!(ap, relax = relax, verbose = false)
-    N = length(π)
-
-    # initialize storage
-    A = Array(Base.SparseMatrix.SparseMatrixCSC{Float64,Int64}, N)
-    gg = Array(Vector{Float64}, N)
-    for n in 1:N
-        A[n] = similar(ap.A)
-        gg[n] = similar(ap.gg)
-    end
-
-    # boundary condition 1: value function at n = N
-    Vend = deepcopy(ap.V)
-    ## boundary condition 1: distribution at n = 1
-    gg[1] = deepcopy(ap.gg)
-
-
-    DynamicAiyagariProblem(ap, π, K, Vend, gg, A, N, dt)
+function residual(ap::AiyagariProblem, ρπ, σπ, V, g, K, r, w, π, Vdot, gdot, Kdot, rdot, wdot, πdot, Verrors, ηπ)
+    newg = vcat(one(eltype(g)) - sum(g), g)
+    as = AiyagariSolution(V, newg, K, r, w)
+    aa = AiyagariArrays(ap, as)
+    HJBFiniteDifference.update_Au!(ap, aa, as)
+    HJBFiniteDifference.update_B!(ap, aa, as)
+    hjbResidual = aa.u + aa.A' * V - ap.ρ * V .+ Vdot .+ Verrors
+    newgIntermediate = aa.A * as.g
+    gResidual = gdot -  newgIntermediate[2:end]
+    KResidual = K - HJBFiniteDifference.sum_capital(ap.a, newg)
+    rResidual = exp(π) * ap.α * K^(ap.α-1) - ap.δ - r
+    wResidual = exp(π) * (1-ap.α) * K^ap.α  - w
+    πResidual = πdot + (1-ρπ) * π - σπ * ηπ
+    return hjbResidual, gResidual, KResidual, rResidual, wResidual, πResidual
 end
 
 
-##############################################################################
-##
-## Solve 
-##
-##############################################################################
-
-# solve hjb
-function solve_hjb!(dap::DynamicAiyagariProblem)
-    dap.ap.V = dap.Vend
-    invdt = 1 / dap.dt
-    for n in dap.N:-1:1
-        # create static problem at date n
-        ap = AiyagariProblem(dap.π[n], dap.ap.γ, dap.ap.α, dap.ap.δ, dap.ap.ρ, dap.ap.z, dap.ap.a, invdt, dap.ap.C, dap.ap.b, dap.K[n], dap.ap.V, dap.gg[n], dap.ap.newV, dap.A[n], dap.ap.B, dap.ap.u, dap.ap.r, dap.ap.w, dap.ap.ra, dap.ap.wz)
-
-        # update prices
-        ap.r = ap.π * ap.α * ap.K^(ap.α-1) - ap.δ    
-        ap.w = ap.π * (1-ap.α) * ap.K^ap.α   
-        broadcast!(*, ap.wz, ap.z, ap.w)
-        broadcast!(*, ap.ra, ap.a, ap.r)
-
-        # update value
-        update_value!(ap)
-
-        (dap.ap.newV, dap.ap.V) = (dap.ap.V, dap.ap.newV)      
-    end
+function unpack(ap::AiyagariProblem, x)
+    lV = length(ap.a) * length(ap.z)
+    lg = length(ap.a) * length(ap.z) - 1
+    start = 1
+    V = x[start:(start + lV - 1)]
+    start += lV
+    g = x[start:(start + lg - 1)]
+    start += lg
+    K = x[start]
+    start += 1
+    r = x[start]
+    start += 1
+    w = x[start]
+    start += 1
+    π = x[start]
+    start += 1
+    Vdot = x[start:(start + lV - 1)]
+    start += lV
+    gdot = x[start:(start + lg - 1)]
+    start += lg
+    Kdot = x[start]
+    start += 1
+    rdot = x[start]
+    start += 1
+    wdot = x[start]
+    start += 1
+    πdot = x[start]
+    start += 1
+    Verrors = x[start:(start + lV - 1)]
+    start += lV
+    ηπ = x[start]
+    @assert start == length(x)
+    return V, g, K, r, w, π, Vdot, gdot, Kdot, rdot, wdot, πdot, Verrors, ηπ
 end
 
-# solve fokker-planck
-function solve_fp!(dap::DynamicAiyagariProblem)
-    for n in 1:(dap.N-1)
-        A = dap.A[n]
-        # convert A to I - dt * A
-        Avals = nonzeros(A) 
-        Arows = rowvals(A)
-        @inbounds for ij in 1:size(A, 2)
-            for k in nzrange(A, ij)
-                Avals[k] = - dap.dt * Avals[k]
-                if Arows[k] == ij
-                    Avals[k] += one(Float64)
-                end
-            end
-        end
-        # obtain next period distribution
-        dap.gg[n+1] = A \ dap.gg[n]
-    end
+function residual(ap, ρπ, σπ, x)
+    out = residual(ap, ρπ, σπ, unpack(ap, x)...)
+    return vcat(out...)
 end
 
-function solve!(dap::DynamicAiyagariProblem ;
-                maxitK::Int = 100,            # maximum number of iterations in the K loop
-                critK::Float64 = 1e-5,        # criterion K loop
-                relax::Float64 = 0.1,         # relaxation parameter 
-                )
-    newK = similar(dap.K)
-    for iter in 1:maxitK
-        println("Main loop iteration ", iter)
-        solve_hjb!(dap)
-        solve_fp!(dap)
-        # Update aggregate capital
-        for n in 1:dap.N
-            newK[n] = sum_capital(dap.ap.a, dap.gg[n])
-        end
-        distance = chebyshev(dap.K, newK)
-        @show distance
-        if chebyshev(dap.K, newK) < critK
-            break
-        else
-            # relaxation algorithm 
-            dap.K = relax * dap.K .+ (1 - relax) * newK  
-        end
-    end
+function solve(ap::AiyagariProblem, ρπ, σπ)
+    @sprintf "Compute Steady State"
+    as = solve(ap)
+    g = as.g[2:end]
+    ap.invΔ = 0.0
+    x0 = vcat(as.V, g, as.K, as.r, as.w, ap.π, zeros(as.V), zeros(g), 0.0, 0.0, 0.0, 0.0, zeros(as.V), 0.0)
+    # check function gives 0.0 at steady state 
+    @assert maxabs(residual(ap, ρπ, σπ, x0)) < 1e-4
+
+    # compute jacobian around 0
+    @sprintf "Compute Jacobian"
+    out = jacobian(x -> residual(ap, ρπ, σπ, x), x0)
+    # unpack derivatives
+    mVarsDerivs = out[:, 1:(length(as.V) + length(g) + 4)]
+    mVarsDotDerivs = out[:, (length(as.V) + length(g) + 4 + 1):(2 * length(as.V) + 2 * length(g) + 2 * 4)]
+    mEErrorsDerivs = out[:, (2 * length(as.V) + 2 * length(g) + 2 * 4 + 1):(2 * length(as.V) + 2 * length(g) + 2 * 4 + length(as.V))]
+    mShocksDerivs = out[:, end:end]
+
+    # solve system
+    @sprintf "Solve Linearized Model"
+    g0 = mVarsDotDerivs
+    g1 = - mVarsDerivs
+    c = zeros(length(as.V) + length(g) + 4, 1)
+    psi = - mShocksDerivs
+    pi = - mEErrorsDerivs
+    G1, C, impact, eu = phact_solver(g0, g1, c, psi, pi)
 end

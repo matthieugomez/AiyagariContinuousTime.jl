@@ -1,4 +1,3 @@
-
 function F!{T}(byp::BansalYaronProblem, μs::Vector{Float64}, σs::Vector{Float64}, bs::Matrix{Float64}, bs∂μ::Matrix{Float64}, bs∂σ::Matrix{Float64}, bs∂2μ::Matrix{Float64}, bs∂2σ::Matrix{Float64}, y::Vector{T}, ydot::Vector{T})
     μn = length(μs)
     σn = length(σs)

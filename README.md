@@ -4,29 +4,19 @@ Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 ```
 
 # Aiyagari
-Following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
+The solution for the steady state follows Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
+The solution for the dynamics follows the solution method of Ahn, Kaplan, Moll, Winberry (Forthcoming)
 
 ```julia
 # solve a static equilibrium
 using HJBFiniteDifference, Gadfly
-π = 1.0
-K = 3.8
-ap = AiyagariProblem(π, K);
-@time solve!(ap)
-
-# solve a dynamic equilibrium
-## construct an unexpected productivity shock π
-dt = 0.5
-π = Array(Float64, 400);
-π[1] = 0.97
-for t in 2:length(π)
-    π[t] = 0.5 * 0.2 * (1.0 - π[t-1]) + π[t-1]
-end
-## solve along this shock
-K = 3.8
-apd = DynamicAiyagariProblem(π, K, dt = dt);
-@time solve!(apd)
-plot(x = collect(1:length(π)), y = apd.K, Geom.line)
+ap = AiyagariProblem(π = 0.0);
+# steady state
+@time solve(ap)
+# dynamics
+ρπ = 0.9
+σπ = 0.1
+@time solve(ap, ρπ, σπ)
 ```
 
 ![aiyagari](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/aiyagari.svg)
