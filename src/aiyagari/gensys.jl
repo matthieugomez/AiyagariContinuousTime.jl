@@ -10,8 +10,8 @@ function gensys(Γ0, Γ1, c, Ψ, Π; clean = true, continuous = true, check_exis
         @sprintf "Converting to Reduced Form"
         redundant = (maxabs(Γ0, 2) .== 0) & (maxabs(Ψ, 2) .== 0)
         base = nullspace(Γ1[redundant, :])
-        Γ0 = lufact!(At_mul_B(base, Γ0 * base))
         try
+            Γ0 = lufact!(At_mul_B(base, Γ0 * base))
             Γ1 = Γ0 \ At_mul_B(base, Γ1 * base)
             Ψ = Γ0 \ At_mul_B(base, Ψ)
             Π = Γ0 \ At_mul_B(base, Π)
@@ -34,10 +34,12 @@ function gensys(Γ0, Γ1, c, Ψ, Π; clean = true, continuous = true, check_exis
     ordschur!(Γ1, select)
     n1 = sum(select)
     Γ1vectors = Γ1[:vectors]
+
+    # Compute G1
     G1 = real(
         A_mul_Bt(Γ1vectors * Γ1[:Schur] * diagm(vcat(ones(n1), zeros(n - n1))), Γ1vectors))
 
-    # thin svd
+    # Compute impact
     u2 = Γ1vectors[:, (n1 + 1):n]
     etawt = svdfact!(At_mul_B(u2, Π))
     ueta, deta, veta  = etawt[:U], etawt[:S], etawt[:V]
