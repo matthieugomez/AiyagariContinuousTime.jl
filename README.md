@@ -11,7 +11,7 @@ using HJBFiniteDifference
 ap = AiyagariProblem(π = 0.0);
 as = solve(ap)
 ```
-- The package solves a dynamic version of the Aiyagri model following Ahn, Kaplan, Moll, Winberry (Forthcoming)
+- The package solves a dynamic version of the Aiyagri model following Ahn, Kaplan, Moll, Winberry
 
 ```julia
 using HJBFiniteDifference, Gadfly

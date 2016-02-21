@@ -10,8 +10,7 @@ function gensys(Γ0, Γ1, c, Ψ, Π; clean = true, continuous = true, check_exis
         @sprintf "Converting to Reduced Form"
         redundant = (maxabs(Γ0, 2) .== 0) & (maxabs(Ψ, 2) .== 0)
         base = nullspace(Γ1[redundant, :])
-        Γ0 = At_mul_B(base, Γ0 * base)
-        Γ0 = lufact!(Γ0)
+        Γ0 = lufact!(At_mul_B(base, Γ0 * base))
         try
             Γ1 = Γ0 \ At_mul_B(base, Γ1 * base)
             Ψ = Γ0 \ At_mul_B(base, Ψ)
@@ -28,19 +27,18 @@ function gensys(Γ0, Γ1, c, Ψ, Π; clean = true, continuous = true, check_exis
     # Schur Decomposition
     Γ1 = schurfact!(Γ1)
     if continuous
-        ordschur!(Γ1, real(Γ1[:values]) .< 0)
-        Γ1eigs = Γ1[:values]
-        nunstab = sum(real(Γ1eigs) .> 0)
+        select = real(Γ1[:values]) .< 0
     else
-        ordschur!(Γ1,  abs(Γ1[:values]) .< 1)
-        Γ1eigs = abs(Γ1[:values])
-        nunstab = sum(real(Γ1eigs) .< 1)
+        select = abs(Γ1[:values]) .< 1
     end
-
-    u1 = Γ1[:vectors][:, 1:(n - nunstab)]
-    u2 = Γ1[:vectors][:, (n - nunstab + 1):n]
+    ordschur!(Γ1, select)
+    n1 = sum(select)
+    Γ1vectors = Γ1[:vectors]
+    G1 = real(
+        A_mul_Bt(Γ1vectors * Γ1[:Schur] * diagm(vcat(ones(n1), zeros(n - n1))), Γ1vectors))
 
     # thin svd
+    u2 = Γ1vectors[:, (n1 + 1):n]
     etawt = svdfact!(At_mul_B(u2, Π))
     ueta, deta, veta  = etawt[:U], etawt[:S], etawt[:V]
     impact = real(-Π * veta * (diagm(deta) \ ueta') * At_mul_B(u2, Ψ) + Ψ)
@@ -54,13 +52,11 @@ function gensys(Γ0, Γ1, c, Ψ, Π; clean = true, continuous = true, check_exis
 
     # check uniqueness
     if check_uniqueness
+        u1 = Γ1vectors[:, 1:n1]
         temp = svdfact!(At_mul_B(u1, Π))
         dont, deta1, veta1 = temp[:U], temp[:S], temp[:V]
         uniqueness = vecnorm(veta1 - veta * At_mul_B(veta, veta1), 2) < (sqrt(eps()) * 10  *  n)
     end
-
-    G1 = real(
-        A_mul_Bt(Γ1[:vectors] * Γ1[:Schur] * diagm(vcat(ones(n - nunstab), zeros(nunstab))), Γ1[:vectors]))
 
     if clean
         G1 = base * A_mul_Bt(G1, base)
