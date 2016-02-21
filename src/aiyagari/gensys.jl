@@ -11,6 +11,7 @@ function gensys(Γ0, Γ1, c, Ψ, Π; clean = true, continuous = true, check_exis
         redundant = (maxabs(Γ0, 2) .== 0) & (maxabs(Ψ, 2) .== 0)
         base = nullspace(Γ1[redundant, :])
         Γ0 = At_mul_B(base, Γ0 * base)
+        Γ0 = lufact!(Γ0)
         try
             Γ1 = Γ0 \ At_mul_B(base, Γ1 * base)
             Ψ = Γ0 \ At_mul_B(base, Ψ)
@@ -59,7 +60,7 @@ function gensys(Γ0, Γ1, c, Ψ, Π; clean = true, continuous = true, check_exis
     end
 
     G1 = real(
-        Γ1[:vectors] * Γ1[:Schur] * diagm(vcat(ones(n - nunstab), zeros(nunstab))) * Γ1[:vectors]')
+        A_mul_Bt(Γ1[:vectors] * Γ1[:Schur] * diagm(vcat(ones(n - nunstab), zeros(nunstab))), Γ1[:vectors]))
 
     if clean
         G1 = base * A_mul_Bt(G1, base)
