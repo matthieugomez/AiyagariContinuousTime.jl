@@ -36,7 +36,7 @@ function F(ap::AiyagariProblem, ρπ, σπ, V, g, K, r, w, π, Vdot, gdot, Kdot,
 end
 
 
-function unpack(ap::AiyagariProblem, x)
+function F(ap, ρπ, σπ, x)
     lV = length(ap.a) * length(ap.z)
     lg = length(ap.a) * length(ap.z) - 1
     start = 1
@@ -68,12 +68,7 @@ function unpack(ap::AiyagariProblem, x)
     start += lV
     ηπ = x[start]
     @assert start == length(x)
-    return V, g, K, r, w, π, Vdot, gdot, Kdot, rdot, wdot, πdot, Verrors, ηπ
-end
-
-function F(ap, ρπ, σπ, x)
-    out = F(ap, ρπ, σπ, unpack(ap, x)...)
-    return vcat(out...)
+    return vcat(F(ap, ρπ, σπ, V, g, K, r, w, π, Vdot, gdot, Kdot, rdot, wdot, πdot, Verrors, ηπ)...)
 end
 
 function solve(ap::AiyagariProblem, ρπ, σπ)

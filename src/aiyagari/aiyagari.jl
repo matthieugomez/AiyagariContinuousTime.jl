@@ -60,7 +60,6 @@ type AiyagariSolution{T}
     w::T
 end
 
-
 function AiyagariSolution{T}(ap::AiyagariProblem; K::T = 3.8)
     # initial value function
     π = ap.π ; α = ap.α ; δ = ap.δ ; z = ap.z ; a = ap.a ; γ = ap.γ ; ρ = ap.ρ
@@ -79,7 +78,6 @@ function AiyagariSolution{T}(ap::AiyagariProblem; K::T = 3.8)
     g = Array(T, an*zn)
     AiyagariSolution(V, g, K, r, w)
 end
-
 
 ##############################################################################
 ##

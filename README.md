@@ -11,7 +11,7 @@ using HJBFiniteDifference
 ap = AiyagariProblem(π = 0.0);
 as = solve(ap)
 ```
-- The package solves a dynamic version of the Aiyagri model following Ahn, Kaplan, Moll, Winberry
+- The package solves a dynamic version of the Aiyagri model following [Ahn, Kaplan, Moll, Winberry](How to solve heterogeneous agent models in continuous time, with aggregate shocks)
 
 ```julia
 using HJBFiniteDifference, Gadfly
