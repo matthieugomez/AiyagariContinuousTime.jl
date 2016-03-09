@@ -10,7 +10,7 @@ Retrieved from http://www.princeton.edu/
 # Model Parameters #
 # ---------------- #
 
-immutable HuggettProblem
+type HuggettProblem
     # discount and interest rates
     ρ::Float64
     r::Float64
@@ -19,38 +19,40 @@ immutable HuggettProblem
     γ::Float64
 
     # labor income parameters
-    λ1::Float64
-    λ2::Float64
-    z1::Float64
-    z2::Float64
+    λ::Vector{Float64}
+    z::Vector{Float64}
 
     # grid on assets. lower bound is borrowing constraint
     agrid::Vector{Float64}
     Δa::Float64
 end
 
-function HuggettProblem(;ρ=0.05, r=0.03, γ=2.0, λ1=0.02, λ2=0.03, z1=0.1, z2=0.2,
-                         abar=-0.02, amax=2.0, Na=500)
+function HuggettProblem(;ρ=0.05, r=0.03, γ=2.0, λ=[1.2, 1.2], z=[0.1, 0.2],
+                         abar=-0.15, amax=5.0, Na=1000)
     agrid = collect(linspace(abar, amax, Na))
     Δa = agrid[2] - agrid[1]
-    HuggettProblem(ρ, r, γ, λ1, λ2, z1, z2, agrid, Δa)
+    HuggettProblem(ρ, r, γ, λ, z, agrid, Δa)
 end
 
-function initial_vf!(m::HuggettProblem, v1::AbstractVector, v2::AbstractVector)
-    for i in 1:length(m.agrid)
-        v1[i] = (m.z1 + m.r*m.agrid[i]).^(1-m.γ)/(m.ρ*(1-m.γ))
-        v2[i] = (m.z2 + m.r*m.agrid[i]).^(1-m.γ)/(m.ρ*(1-m.γ))
+Base.copy(m::HuggettProblem) =
+    HuggettProblem([copy(getfield(m, k)) for k in fieldnames(m)]...)
+
+function initial_vf!(m::HuggettProblem, v)
+    size(v) != (length(m.agrid), length(m.z)) && error("v wrong shape")
+    for j in 1:length(m.z), i in 1:length(m.agrid)
+        v[i, j] = (m.z[j] + m.r*m.agrid[i]).^(1-m.γ)/(m.ρ*(1-m.γ))
+        v[i, j] = (m.z[j] + m.r*m.agrid[i]).^(1-m.γ)/(m.ρ*(1-m.γ))
     end
-    v1, v2
+    v
 end
 
-function explicit_solve(m::HuggettProblem, maxit::Int=20_000,
-                        tol::Float64=1e-6)
+initial_vf(m) = initial_vf!(m, Array(Float64, length(m.agrid), length(m.z)))
+
+function explicit_solve_hjb(m::HuggettProblem, v=initial_vf(m),
+                            maxit::Int=20_000, tol::Float64=1e-6, verbose=false)
     # extract parameters
-    Na = length(m.agrid)
+    Na, z, λ = length(m.agrid), m.z, m.λ
     m1_γ = -1/m.γ
-    z = [m.z1, m.z2]
-    λ = [m.λ1, m.λ2]
 
     # to be used later
     css = z' .+ m.r*m.agrid
@@ -59,8 +61,6 @@ function explicit_solve(m::HuggettProblem, maxit::Int=20_000,
     dvb1 = (z + m.r*m.agrid[1]).^(-m.γ)
 
     # initial guess at vf
-    v = Array(Float64, length(m.agrid), 2)
-    initial_vf!(m, sub(v, :, 1), sub(v, :, 2))
     old_v = copy(v)
 
     start_t = time()
@@ -106,21 +106,24 @@ function explicit_solve(m::HuggettProblem, maxit::Int=20_000,
         # end
 
         if err < tol
-            println("converged in $it steps in $(time() -start_t) seconds")
-            return v
+            if verbose
+                println("converged in $it steps in $(time() -start_t) seconds")
+            end
+            # a hack to get the A matrix from the implicit method so we can
+            # solve FP below.
+            return v, implicit_solve_hjb(m, v)[2]
         end
     end
 
     error("maxit exceeded")
 end
 
-function implicit_solve(m::HuggettProblem, Δ::Float64=1000.0, maxit=10_000,
-                        tol=1e-6)
+function implicit_solve_hjb(m::HuggettProblem, v=initial_vf(m),
+                            Δ::Float64=1000.0, maxit=10_000, tol=1e-6,
+                            verbose=false)
     # extract parameters
-    Na = length(m.agrid)
+    Na, z, λ = length(m.agrid), m.z, m.λ
     m1_γ = -1/m.γ
-    z = [m.z1, m.z2]
-    λ = [m.λ1, m.λ2]
 
     # to be used later
     income = z' .+ m.r*m.agrid
@@ -130,8 +133,6 @@ function implicit_solve(m::HuggettProblem, Δ::Float64=1000.0, maxit=10_000,
     dvb1 = (z + m.r*m.agrid[1]).^(-m.γ)
 
     # initial guess at vf
-    v = Array(Float64, length(m.agrid), 2)
-    initial_vf!(m, sub(v, :, 1), sub(v, :, 2))
     old_v = copy(v)
 
     # lower, mid, and upper diagonal for Tridiagonal part of A
@@ -192,23 +193,79 @@ function implicit_solve(m::HuggettProblem, Δ::Float64=1000.0, maxit=10_000,
         err = chebyshev(v, old_v)
 
         if err < tol
-            return v
+            return v, A
         end
 
-        @printf "%-8i%-12.5e%12.5f\n" it err (time() - start_t)
+        if verbose
+            @printf "%-8i%-12.5e%12.5f\n" it err (time() - start_t)
+        end
 
     end
 
     error("maxit exceeded")
 end
 
+function solve_kolmogorov_forward(m::HuggettProblem, A::AbstractSparseMatrix)
+    Na = length(m.agrid)
+    AT = A'
+    rhs = zeros(2Na)
 
-function solve(m::HuggettProblem; method::Symbol=:implicit, maxit::Int=20_000,
-               tol::Float64=1e-6, Δ::Float64=1000.0)
+    # fix one eigenvalue, otherwise matrix is singular
+    fixer = 1
+    rhs[fixer] = 0.1
+    AT[fixer, :] = 0.0
+    AT[fixer, fixer] = 1.0
+
+    # normalize
+    gg = AT\rhs
+    gg ./= (sum(gg)*m.Δa)
+
+    # put into columns
+    g = [gg[1:Na] gg[Na+1:2Na]]
+
+    # check that we actually have what we think we do
+    @assert sum(sum(g, 1) .* m.Δa) - 1.0 < 1e-10
+
+    g
+end
+
+
+function solve_hjb(m::HuggettProblem; method::Symbol=:implicit, maxit::Int=20_000,
+                   tol::Float64=1e-6, Δ::Float64=1000.0, verbose=false)
 
     if method == :implicit
-        implicit_solve(m, Δ, maxit, tol)
+        implicit_solve_hjb(m, initial_vf(m), Δ, maxit, tol, verbose)
     else
-        explicit_solve(m, maxit, tol)
+        explicit_solve_hjb(m, initial_vf(m), maxit, tol, verbose)
     end
+end
+
+function solve_partial_eq(m::HuggettProblem; method::Symbol=:implicit,
+                          maxit::Int=20_000, tol::Float64=1e-6,
+                          Δ::Float64=1000.0, verbose=false)
+    v, A = solve_hjb(m; method=method, maxit=maxit, tol=tol, Δ=Δ,
+                     verbose=verbose)
+    g = solve_kolmogorov_forward(m, A)
+    v, g, A
+end
+
+aggregate_savings(m::HuggettProblem, v, g) = sum(sum(g'm.agrid)) * m.Δa
+
+function solve_general_eq(m::HuggettProblem, rl=0.01, ru=0.04;
+                          verbose::Bool=false)
+    rstar = brent(rl, ru) do r
+        m_r = copy(m); m_r.r = r
+        v, g, A = solve_partial_eq(m_r; verbose=verbose)
+        aggregate_savings(m, v, g)
+    end
+
+    # build model with this interest rate
+    m_out = copy(m); m_out.r = rstar
+
+    # build partial equilibrium solution
+    v, g, A = solve_partial_eq(m_out; verbose=verbose)
+
+    # reutrn model and solution
+    m, v, g, A
+
 end
