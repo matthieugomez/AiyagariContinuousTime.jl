@@ -19,6 +19,8 @@ include("aiyagari/aiyagari.jl")
 include("aiyagari/dynamicaiyagari.jl")
 include("aiyagari/gensys.jl")
 
+include("huggett/huggett.jl")
+
 include("bansalyaron/bansalyaronproblem.jl")
 include("bansalyaron/finitedifferences.jl")
 include("bansalyaron/spectralmethod.jl")
@@ -27,7 +29,7 @@ include("bansalyaron/spectralmethod.jl")
 
 ##############################################################################
 ##
-## Exported methods and types 
+## Exported methods and types
 ##
 ##############################################################################
 export solve,
@@ -37,7 +39,8 @@ AiyagariArrays,
 AiyagariSolution,
 DynamicAiyagariSolution,
 BansalYaronProblem,
-plot_ll
+HuggettProblem
+# plot_ll
 #phact_solver
 
 end

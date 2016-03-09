@@ -52,6 +52,21 @@ plot(byp, solution, :m)
 ![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp_m.svg)
 ![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp_vol.svg)
 
+# Huggett
+
+This package also solves the economy of Huggett as described in Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time":
+
+```julia
+using HJBFiniteDifference
+
+m = HuggettProblem()
+
+# using explicit scheme
+v_explicit = solve(m; method=:explicit)
+
+# using implicit scheme (recommended)
+v_implicit = solve(m; method=:implicit)
+```
 
 # Bibliography
 Two excellent resources to learn about finite difference schemes and their applications to HJB equations:
