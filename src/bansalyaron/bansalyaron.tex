@@ -13,14 +13,12 @@ HJB is
 $$0 = \rho \theta V_t(\frac{C_t^{\frac{1-\gamma}{\theta}}}{((1-\gamma)V_t)^{\frac{1}{\theta}}}-1) + \frac{E[dV_t]}{dt}$$
 Let's define $G_t$ such that
 $$V_t = \frac{C_t^{1-\gamma}}{1-\gamma} G_t$$
-By Ito, 
-$$0 = \rho\theta(G_t^{1-\frac{1}{\theta}}-G_t)   +  G_t E\frac{\frac{dC_t^{1-\gamma}}{C_t^{1-\gamma}}}{dt} + E\frac{dG_t}{dt} + E\frac{dG_t\frac{dC_t^{1-\gamma}}{C_t^{1-\gamma}}}{dt}$$
-Denoting $\mu_{C}$ and $\sigma_{C}$ the geometric drift of $C_t$, we have
-\begin{align*}
-	\frac{dC_{t}^{1-\gamma}}{C_{t}^{1-\gamma}}=((1-\gamma)\mu_{C}-\frac{1}{2}(1-\gamma)\gamma\sigma^{2}_{C})dt + (1-\gamma)\sigma_{C}dW_t
-\end{align*}
-Injecting this expression into HJB and denoting $\mu_G, \sigma_G$ the arithmetic drift and volatility of $G_t$
+$G$ is directly related to the wealth/consumption ratio:
+$$WC_{t} = \frac{G_t^{1/\theta}}{\rho}$$
+
+By Ito, denoting $\mu_{C}$ and $\sigma_{C}$ the geometric drift of $C_t$, and $\mu_G, \sigma_G$ the arithmetic drift and volatility of $G_t$
 $$0 = \rho \theta (G_t^{1-\frac{1}{\theta}}-G_t)  + G_t ((1-\gamma) \mu_{C} - \frac{1}{2}(1-\gamma)\gamma\sigma_{C}'\sigma_{C}) +  \mu_G + \sigma_G'(1-\gamma)\sigma_{C}$$
+
 
 \section{Long run risk model}
 
@@ -37,21 +35,31 @@ We write $G_t = G(\mu, \sigma)$ and we get the PDE
 	&+ \kappa_{\mu}(\bar{\mu}-\mu)\frac{\partial G}{\partial\mu}+  \kappa_{\sigma}(1-\sigma)\frac{\partial G}{\partial\sigma}\\
 	&+\frac{1}{2}\nu_{\mu}^{2}\sigma\frac{\partial^{2}G}{\partial\mu^{2}}+\frac{1}{2}\nu_{\sigma}^{2}\sigma \frac{\partial^{2}G}{\partial\sigma^{2}}
 \end{align*}
+
+
 \subsubsection{Log linearization method}
 We guess $G = e^{A_0+ A_1\mu_t + A_2 \sigma_t}$ and linearize the non linear term in $G$ 
-$$G^{-\frac{1}{\theta}} \approx e^{-\frac{1}{\theta}(A_0 + A_1 \overline{\mu} + A_2)}(1-\frac{1}{\theta}(A_1(\mu_t -\overline{\mu}) + A_2 (\sigma_t-1))$$
-	
-We can then solve for $A_0, A_1, A_2$ by setting the constant term, the term in $\mu_t$ and the term in $\sigma_t$ to zero in the linearized PDE.
+$$G^{-\frac{1}{\theta}} \approx \overline{G}(1-\frac{1}{\theta}(A_1(\mu_t -\overline{\mu}) + A_2 (\sigma_t-1))$$
+We can then solve for $A_0, A_1, A_2$ by setting the constant term, the term in $\mu_t$ and the term in $\sigma_t$ to zero in the linearized PDE. We obtain
+\begin{align*}
+	0&=-\rho  \overline{G}A_1 + 1-\gamma -\kappa_\mu A_1\\\
+	0&=-\rho  \overline{G}A_2 -\frac{1}{2}(1-\gamma)\gamma \nu_D^2 + \kappa_\sigma (1-\sigma)A_2 + \frac{1}{2}\nu_\mu^2A_1^2 +\frac{1}{2}\nu_\sigma^2A_2^2
+\end{align*}
+
+Bansal Yaron (2004) find
+\begin{align*}
+	A1 &= \theta \frac{1-\frac{1}{\psi}}{1-0.997 e^{-\kappa_\mu}}\\
+	A2 &= 0.5\theta^2\frac{(1 - \frac{1}{\psi})^2 + (A_1  0.997 \frac{\nu_\mu}{\nu_D})^2}{1-0.997e^{-\kappa_\sigma}}
+\end{align*}
 \subsubsection{Finite Difference Method}
 We can discretize this PDE on a grid using a Finite Difference Scheme. 
-We assume that the processes associated with state variables have reflecting boundaries at the borders (except at the LHS border for $\sigma$). This gives a supplementary condition of the form $\partial G = 0$ at the borders\footnote{At the frontier we have
-$$dG_{t} = G'(x) \sigma(x) \sqrt{dt} + G'(x)\mu(x) dt + \frac{1}{2}G''(x)\sigma^2(x)dt + o(dt)$$
-Since $dG_t$ is $O(dt)$, we must have $G'(x) = 0$, at least when $\sigma(x) \neq 0$.}
-
-
-To handle boundary conditions, we upwind the first derivative. This means that we approximate $\partial G$ by a forward difference when the drift is positive and a backward difference when the drift is negative. The second derivative at the border involves points outside the grid. We find the value of $G$ at these points by applying the reflecting boundary condition at these points. \footnote{At the points $j = 0$, the volatility is zero. Although we don't have the border condition $\partial_\sigma G = 0$ or $\partial_\mu G = 0$ anymore, the term involving the second derivative disappears naturally}
-
-
+\begin{itemize}
+	\item We upwind the first derivative, i.e. we approximate $\partial G$ by a forward difference when the drift is positive and a backward difference when the drift is negative. 
+	\item At the border of the grid, the PDE involves the value of $G$ outside the grid (through the second derivative). To get the value of $G$ at these nodes, we apply a boundary counditions: state variables have reflecting boundaries at the borders. This gives a supplementary condition of the form $\partial G = 0$ at the borders\footnote{At the frontier we have $$dG_{t} = G'(x) \sigma(x) \sqrt{dt} + G'(x)\mu(x) dt + \frac{1}{2}G''(x)\sigma^2(x)dt + o(dt)$$
+	Since $dG_t$ is $O(dt)$, we must have $G'(x) = 0$, at least when $\sigma(x) \neq 0$.At the points $j = 0$, the volatility is zero. 
+	At the frontier $\sigma = 0$, the term involving the second derivative disappears naturally so we don't need to add a reflecting boundary conditon}
+\end{itemize}
+To handle boundary conditions, 
 To sum up the scheme is 
 \begin{align*}
 	0&= \rho \theta[(G_{ij})^{1-\frac{1}{\theta}}- G_{ij}]+G_{ij}((1-\gamma)\mu_i-\frac{1}{2}(1-\gamma)\gamma\nu_D^2\sigma_j)\\
@@ -59,14 +67,12 @@ To sum up the scheme is
 	&+(\kappa_{\sigma_j}(1-\sigma_j))^+\frac{G_{i, j+1}-G_{i,j}}{\Delta \sigma}+(\kappa_{\sigma_j}(1-\sigma_j))^-\frac{G_{i, j}-G_{i,j-1}}{\Delta \sigma}\\
 	&+\frac{1}{2}\nu_{\mu_i}^{2}\sigma_j\frac{G_{i+1, j} - 2 G_{i, j} + G_{i-1, j}}{(\Delta\mu)^2}+\frac{1}{2}\nu_{\sigma_j}^{2}\sigma_j\frac{G_{i, j+1} - 2 G_{i, j} + G_{i, j-1}}{(\Delta\sigma)^2}
 \end{align*}
-
 Denote $Y$ the vector of  $(G_{ij})_{1 \leq i,j\leq n}$. The scheme  defines a function $F$ such that $F(Y) = 0$. We can solve for $Y$ using one of these methods:
 \begin{enumerate}
 	\item Use a non linear solver for the system $F(Y) = 0$. These algorithms start with an initial guess, and update based on the Jacobian of $F$. In some PDE (not this one), you need a good initial guess. A technique is to solve the PDE for $\theta = 1$, and use the solution at an initial guess for other values of $\theta$.
 	\item Use an ODE solver for the system $F(Y) = \dot{Y}$. The solution when $T\rightarrow +\infty$ is the solution of the PDE. This method is called ``the method of lines''.
 \end{enumerate}
 Both methods require the jacobian of $F$, which can generally be automatically computed using automatic or numerical differenciation. 
-
 A solution that would \textit{not} work is to solve for $G$ by iterating over time
 \begin{align*}
 	\frac{G_{n+1}-G_n}{\Delta t} &= F(G_n)
@@ -81,51 +87,99 @@ The value function is characterized by its coordinates $a_{kl}$ on this basis. W
 
 \subsection{Comparison}
 
-\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|}
 	\hline 
-	Name & BY04 & BY04 & This paper & This paper & Link
+	\multicolumn{4}{c}{Correspondances}
 	\\
 	\hline 
 	\hline 
-	mean growth rate & $\mu$ & 0.0015 & $\bar{\mu}$ & 0.0015 & $\mu=\bar{\mu}$
+	mean growth rate & $\mu$ & $\bar{\mu}$ & $\mu=\bar{\mu}$
 	\\
 	\hline 
-	mean volatility & $\sigma^{2}$ & 0.00006084 & $\nu_{D}$ & 0.0078 & $\sqrt{\sigma^{2}}=\nu_{D}$
+	mean volatility & $\sigma^{2}$ & $\nu_{D}$ & $\sqrt{\sigma^{2}}=\nu_{D}$
 	\\
 	\hline 
-	growth persistence & $\rho$ & 0.979 & $\kappa_{\mu}$ & 0.0212 & $ - \log(\rho) = \kappa_\mu$ 
+	growth persistence & $\rho$ & $\kappa_{\mu}$ & $ - \log(\rho) = \kappa_\mu$ 
 	\\
 	\hline 
-	volatility persistence & $\nu_{1}$ & 0.987 & $\kappa_{\sigma}$ & 0.0131 & $-\log\left(\nu_{1}\right)=\kappa_{\sigma}$
+	volatility persistence & $\nu_{1}$ & $\kappa_{\sigma}$ & $-\log\left(\nu_{1}\right)=\kappa_{\sigma}$
 	\\
 	\hline 
-	growth rate volatility & $\varphi_{e}$ & 0.044 & $\nu_{\mu}$ & 0.0003432 & $\varphi_{e}\times\sqrt{\sigma^{2}}=\nu_{\mu}$
+	growth rate volatility & $\varphi_{e}$ & $\nu_{\mu}$ & $\varphi_{e}\times\sqrt{\sigma^{2}}=\nu_{\mu}$
 	\\
 	\hline 
-	volatility volatility & $\sigma_{w}$ & 0.0000023 & $\nu_{\sigma}$ & 0.0378 & $\sigma_{w}/\sigma^{2}=\nu_{\sigma}$
+	volatility volatility & $\sigma_{w}$ & $\nu_{\sigma}$ & $\sigma_{w}/\sigma^{2}=\nu_{\sigma}$
 	\\
 	\hline 
-	time discount & $\delta$ & 0.998 & $\rho$ & 0.002 & $-\log\left(\delta\right)=\rho$
+	time discount & $\delta$ & $\rho$ & $-\log\left(\delta\right)=\rho$\\
+	\hline
+\end{tabular}
+
+
+\begin{tabular}{|c|c|c|}
+	\hline 
+	\multicolumn{3}{|c|}{BY 2004}
 	\\
 	\hline 
-	RRA & $1-\gamma$(RRA) & 7.5 or 10 & $1-\gamma$ & -6.5 or -9 & $1-\text{RRA}=1-\gamma$
+	Name & Discrete Time & Continuous Time
 	\\
 	\hline 
-	IES & $\psi$ & 1.5 & $\psi$ & 1.5 & $\psi = \psi$
+	mean growth rate & $\mu =  0.0015$ &  $\overline{\mu} = 0.0015$
+	\\
+	\hline 
+	mean volatility & $\sigma = 0.0078$ & $\nu_{D}=0.0078$
+	\\
+	\hline 
+	growth persistence & $\rho = 0.979$ & $\kappa_{\mu}= 0.0212 $
+	\\
+	\hline 
+	volatility persistence & $\nu_1 = 0.987$ & $\kappa_{\sigma}=0.0131$ 
+	\\
+	\hline 
+	growth rate volatility &  $\phi_e = 0.044$ & $\nu_{\mu}= 0.0003432$
+	\\
+	\hline 
+	volatility volatility & $\sigma_w = 0.0000023$ & $\nu_{\sigma}=0.0378$ 
+	\\
+	\hline 
+	time discount & $\delta = 0.998$  & $\rho=0.002$
 	\\
 	\hline
 \end{tabular}
-Also,  $\theta = (1-\gamma)/(1- 1/\psi)$ = -19.50 or -27.
-Let's express the  wealth to consumption ratio $K_t$ in term of state variables.
-$$V = G_tK_t^{\gamma - 1}\frac{W^{1-\gamma}}{(1-\gamma)}$$
-FOC for consumption can be written
-$$K_t^{-1} = \rho^{\psi} K_t^{\psi - 1}G_t^\frac{1-\psi}{1-\gamma}$$
-We conclude 
-$$K_t = \rho^{-1} G_t^{1/\theta}$$
-Bansal Yaron find
-\begin{align*}
-	\log K_t &\propto A_1 \mu_t + A_2 \nu_D^2\sigma_t\\
-	A1 &= \frac{1-\frac{1}{\psi}}{1-0.997 e^{-\kappa_\mu}}\\
-	A2 &= 0.5\theta\frac{(1 - \frac{1}{\psi})^2 + (A_1  0.997 \frac{\nu_\mu}{\nu_D})^2}{1-0.997e^{-\kappa_\sigma}}
-\end{align*}
+
+\begin{tabular}{|c|c|c|}
+	\hline 
+	\multicolumn{3}{|c|}{BKY 2007}
+	\\
+	\hline
+	Name & Discrete Time & Continuous Time 
+	\\
+	\hline 
+	\hline 
+	mean growth rate & $\mu =  0.0015$ &  $\overline{\mu} = 0.0015$
+	\\
+	\hline 
+	mean volatility & $\sigma = 0.0072$ & $\nu_{D}=0.0072$
+	\\
+	\hline 
+	growth persistence & $\rho = 0.975$ & $\kappa_{\mu}= 0.0253 $
+	\\
+	\hline 
+	volatility persistence & $\nu_1 = 0.999$ & $\kappa_{\sigma}=0.001$ 
+	\\
+	\hline 
+	growth rate volatility &  $\phi_e = 0.038$ & $\nu_{\mu}= 0.00274$
+	\\
+	\hline 
+	volatility volatility & $\sigma_w = 0.00000283$ & $\nu_{\sigma}=0.05401$ 
+	\\
+	\hline 
+	time discount & $\delta = 0.9989$  & $\rho=0.0011$
+	\\
+	\hline
+\end{tabular}
+
+
+
+
 \end{document}

@@ -32,7 +32,7 @@ The package solves the PDE associated with the long run risk model of Bansal-Yar
 
 ```julia
 using HJBFiniteDifference, Gadfly
-byp = BansalYaronProblem(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.0000028 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
+byp = BansalYaronProblem(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.00000283 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
 
 # Finite Differences (Nonlinear solver)
 solution = solve(byp, method = :nl)
@@ -54,6 +54,8 @@ plot(byp, solution, :m)
 
 
 # Bibliography
-Two excellent resources to learn about finite difference schemes and their applications to HJB equations:
+Three excellent resources to learn about finite difference schemes and their applications to HJB equations:
 - [Numerical analysis of partial differential equations arising in finance and stochastic control](http://www.cmap.polytechnique.fr/%7Ebonnans/notes/edpfin/edpfin.html) by Frédéric Bonnans.
+- [An introduction to Finite Difference methods for
+PDEs in Finance](https://www.fields.utoronto.ca/programs/scientific/09-10/finance/courses/tourin.pdf)  by Agnès Tourin 
 -  [Heterogeneous Agent Models in Continuous Time](http://www.princeton.edu/~moll/HACTproject.htm) by Ben Moll.
