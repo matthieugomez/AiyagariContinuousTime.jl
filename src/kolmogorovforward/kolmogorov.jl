@@ -36,7 +36,6 @@ function computeA(x::AbstractVector, μ::AbstractVector, σ::AbstractVector)
 end
 
 function kolmogorovforward(A::Matrix)
-    @show "ok2"
     n = size(A, 1)
     # numerical fix 
     for i in 1:n
