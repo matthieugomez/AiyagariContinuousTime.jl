@@ -35,7 +35,7 @@ function computeA(x, μ, σ)
     return A
 end
 
-
+# A has sum of columns = 0 + off diagonal elements non negative. Therefore there is vector in its nullspace which is positive (elementwise)
 function kolmogorovforward(A)
     n = size(A, 1)
     # numerical fix 
@@ -47,7 +47,7 @@ function kolmogorovforward(A)
     return g
 end
 
-
+# δI - A is a M matrix. Therefore the solution of (δI - A)g = δ * ψ is positive (elementwise)
 function kolmogorovforward(A, δ, ψ)
     n = size(A, 1)
     g = (δ * eye(n) - A) \ (δ * ψ)
