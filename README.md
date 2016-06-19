@@ -3,6 +3,24 @@
 Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 ```
 
+# Kolmogorov Forward
+The package solve kolmogorov forward equation on a grid.
+Given a grid `x`, the vectors `μ, σ, δ, ψ`, the function returns `g` such that 
+`0 = -∂_X(μ(x)g(x)) + 0.5 * ∂_X^2(σ^2(x)g(x)) + δ (ψ - 1)`
+The grid is potentially non-uniform. The function outputs a vector `g` such that `Σ g = 1.0` (i.e. `g` is the product of the pdf and `Δx`)
+
+In the simple case of a power law distribution
+```julia
+using HJBFiniteDifference
+x = logspace(-2, 3, 100)
+μ = -0.11 .* x
+σ = 0.1 .* x
+g = kolmogorovforward(x, μ, σ)
+using Gadfly
+plot(x = log(x), y = log(reverse(cumsum(reverse(g)))), Geom.line, Guide.xlabel("log-x"), Guide.ylabel("log-cdf"))
+```
+
+
 # Aiyagari
 - The package solves the Aiyagari model following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
 ```julia

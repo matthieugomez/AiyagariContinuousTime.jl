@@ -15,9 +15,11 @@ using CompEcon
 ## Load files
 ##
 ##############################################################################
+include("kolmogorovforward/kolmogorov.jl")
 include("aiyagari/aiyagari.jl")
 include("aiyagari/dynamicaiyagari.jl")
 include("aiyagari/gensys.jl")
+
 
 include("bansalyaron/bansalyaronproblem.jl")
 include("bansalyaron/finitedifferences.jl")
