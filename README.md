@@ -6,19 +6,20 @@ Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 # Kolmogorov Forward
 The package solve the kolmogorov forward equation on a grid.
 Given a grid `x` and a set of vectors `μ, σ, δ, ψ`, the function returns `g` such that 
-`0 = -∂(μg) + 0.5 * ∂^2(σ^2g) + δ (ψ - 1)`
+`0 = -∂(μ g) + 0.5 * ∂^2(σ^2 g) + δ (ψ - 1)`
 
-The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. If if `σX` is not null at the boundary of the grids, the process is assumed to be reflected.
+The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. If `σ` is not null at the boundary of the grids, the process is assumed to be reflected at the boundary.
 
-For instance, we can check that the stationary distribution of a brownian motion with negative drift is power law:
+For instance, let us plot the stationary distribution of a brownian motion with negative drift (which is pareto):
 ```julia
 using HJBFiniteDifference
-x = logspace(-2, 10, 100)
-μ = -0.01 .* x
-σ = 0.1 .* x
+x = logspace(-2, 5, 100)
+μ = -0.001 .* x
+σ = 0.2 .* x
 g = kolmogorovforward(x, μ, σ)
+cumulativeg = cumsum(g)
 using Gadfly
-plot(x = log(x), y = log(reverse(cumsum(reverse(g)))), Geom.line, Guide.xlabel("log-x"), Guide.ylabel("log-cdf"))
+plot(x = log(x), y = log(1 .- cumulativeg), Geom.line, Guide.xlabel("log-x"), Guide.ylabel("log 1-cdf"))
 ```
 ![kolmogorov](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/kolmogorov.svg)
 
