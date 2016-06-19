@@ -1,5 +1,6 @@
 function computeA(x::AbstractVector, μ::AbstractVector, σ::AbstractVector)
     n = length(x)
+    # construct small Δx for finite difference scheme
     Δxm = zeros(x)
     for i in 2:n
         Δxm[i] = x[i] - x[i-1]
@@ -12,6 +13,7 @@ function computeA(x::AbstractVector, μ::AbstractVector, σ::AbstractVector)
     for i in 1:n
         Δx[i] = 0.5 * (Δxm[i] + Δxp[i])
     end
+    # construct matrix A
     A = zeros(n, n)
     for i in 1:length(x)
         # drift
