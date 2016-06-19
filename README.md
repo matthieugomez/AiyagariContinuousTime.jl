@@ -13,8 +13,8 @@ The function outputs a vector `g Δx`  which sums to one. The grid `x` is potent
 For instance, we can check that the stationary distribution of a brownian motion with negative drift is power law:
 ```julia
 using HJBFiniteDifference
-x = logspace(-2, 3, 100)
-μ = -0.11 .* x
+x = logspace(-2, 10, 100)
+μ = -0.01 .* x
 σ = 0.1 .* x
 g = kolmogorovforward(x, μ, σ)
 using Gadfly

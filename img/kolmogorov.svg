@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:gadfly="http://www.gadflyjl.org/ns"
+     version="1.2"
+     width="152.4mm" height="101.6mm" viewBox="0 0 152.4 101.6"
+     stroke="none"
+     fill="#000000"
+     stroke-width="0.3"
+     font-size="3.88"
+>
+<g class="plotroot xscalable yscalable" id="img-202bf658-1">
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="img-202bf658-2">
+    <text x="83.24" y="89.99" text-anchor="middle" dy="0.6em">log-x</text>
+  </g>
+  <g class="guide xlabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="img-202bf658-3">
+    <text x="21.07" y="83.32" text-anchor="middle" dy="0.6em">-10</text>
+    <text x="52.15" y="83.32" text-anchor="middle" dy="0.6em">0</text>
+    <text x="83.24" y="83.32" text-anchor="middle" dy="0.6em">10</text>
+    <text x="114.32" y="83.32" text-anchor="middle" dy="0.6em">20</text>
+    <text x="145.4" y="83.32" text-anchor="middle" dy="0.6em">30</text>
+  </g>
+<g clip-path="url(#img-202bf658-4)">
+  <g id="img-202bf658-5">
+    <g pointer-events="visible" opacity="1" fill="#000000" fill-opacity="0.000" stroke="#000000" stroke-opacity="0.000" class="guide background" id="img-202bf658-6">
+      <rect x="19.07" y="5" width="128.33" height="77.32"/>
+    </g>
+    <g class="guide ygridlines xfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="img-202bf658-7">
+      <path fill="none" d="M19.07,80.32 L 147.4 80.32"/>
+      <path fill="none" d="M19.07,61.99 L 147.4 61.99"/>
+      <path fill="none" d="M19.07,43.66 L 147.4 43.66"/>
+      <path fill="none" d="M19.07,25.33 L 147.4 25.33"/>
+      <path fill="none" d="M19.07,7 L 147.4 7"/>
+    </g>
+    <g class="guide xgridlines yfixed" stroke-dasharray="0.5,0.5" stroke-width="0.2" stroke="#D0D0E0" id="img-202bf658-8">
+      <path fill="none" d="M21.07,5 L 21.07 82.32"/>
+      <path fill="none" d="M52.15,5 L 52.15 82.32"/>
+      <path fill="none" d="M83.24,5 L 83.24 82.32"/>
+      <path fill="none" d="M114.32,5 L 114.32 82.32"/>
+      <path fill="none" d="M145.4,5 L 145.4 82.32"/>
+    </g>
+    <g class="plotpanel" id="img-202bf658-9">
+      <g stroke-width="0.3" fill="#000000" fill-opacity="0.000" class="geometry" stroke-dasharray="none" stroke="#00BFFF" id="img-202bf658-10">
+        <path fill="none" d="M37.84,7 L 38.71 7.44 39.57 8.1 40.44 8.77 41.31 9.44 42.18 10.1 43.04 10.77 43.91 11.43 44.78 12.1 45.65 12.77 46.51 13.43 47.38 14.1 48.25 14.77 49.12 15.43 49.98 16.1 50.85 16.77 51.72 17.43 52.59 18.1 53.46 18.77 54.32 19.43 55.19 20.1 56.06 20.77 56.93 21.43 57.79 22.1 58.66 22.77 59.53 23.43 60.4 24.1 61.26 24.77 62.13 25.43 63 26.1 63.87 26.76 64.73 27.43 65.6 28.1 66.47 28.76 67.34 29.43 68.2 30.1 69.07 30.76 69.94 31.43 70.81 32.1 71.67 32.76 72.54 33.43 73.41 34.1 74.28 34.76 75.14 35.43 76.01 36.1 76.88 36.76 77.75 37.43 78.61 38.1 79.48 38.76 80.35 39.43 81.22 40.1 82.08 40.76 82.95 41.43 83.82 42.09 84.69 42.76 85.55 43.43 86.42 44.09 87.29 44.76 88.16 45.43 89.02 46.09 89.89 46.76 90.76 47.43 91.63 48.09 92.49 48.76 93.36 49.43 94.23 50.09 95.1 50.76 95.96 51.43 96.83 52.09 97.7 52.76 98.57 53.43 99.43 54.09 100.3 54.76 101.17 55.43 102.04 56.09 102.9 56.76 103.77 57.42 104.64 58.09 105.51 58.76 106.37 59.42 107.24 60.09 108.11 60.76 108.98 61.42 109.84 62.09 110.71 62.76 111.58 63.42 112.45 64.09 113.31 64.76 114.18 65.42 115.05 66.09 115.92 66.76 116.78 67.42 117.65 68.09 118.52 68.76 119.39 69.44 120.25 70.13 121.12 70.83 121.99 71.59 122.86 72.48 123.72 73.92"/>
+      </g>
+    </g>
+  </g>
+</g>
+  <g class="guide ylabels" font-size="2.82" font-family="'PT Sans Caption','Helvetica Neue','Helvetica',sans-serif" fill="#6C606B" id="img-202bf658-11">
+    <text x="18.07" y="80.32" text-anchor="end" dy="0.35em">-80</text>
+    <text x="18.07" y="61.99" text-anchor="end" dy="0.35em">-60</text>
+    <text x="18.07" y="43.66" text-anchor="end" dy="0.35em">-40</text>
+    <text x="18.07" y="25.33" text-anchor="end" dy="0.35em">-20</text>
+    <text x="18.07" y="7" text-anchor="end" dy="0.35em">0</text>
+  </g>
+  <g font-size="3.88" font-family="'PT Sans','Helvetica Neue','Helvetica',sans-serif" fill="#564A55" stroke="#000000" stroke-opacity="0.000" id="img-202bf658-12">
+    <text x="8.81" y="41.66" text-anchor="middle" dy="0.35em" transform="rotate(-90, 8.81, 43.66)">log-cdf</text>
+  </g>
+</g>
+<defs>
+  <clipPath id="img-202bf658-4">
+  <path d="M19.07,5 L 147.4 5 147.4 82.32 19.07 82.32" />
+</clipPath>
+</defs>
+</svg>
