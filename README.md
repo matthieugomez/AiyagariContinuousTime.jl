@@ -4,7 +4,7 @@ Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 ```
 
 # Kolmogorov Forward
-The package solve the kolmogorov forward equation on a grid, i.e. the stationary distribution `g` that solves
+The package solves the kolmogorov forward equation on a grid, i.e. the stationary distribution `g` that solves
 
 `0 = -∂(μ g) + 0.5 * ∂^2(σ^2 g) + δ (ψ - 1)`
 
