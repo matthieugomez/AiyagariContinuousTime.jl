@@ -4,8 +4,7 @@ Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 ```
 
 # Kolmogorov Forward
-The package solve the kolmogorov forward equation on a grid.
-Given a grid `x` and a set of vectors `μ, σ, δ, ψ`, the function returns `g` such that 
+The package solve the kolmogorov forward equation on a grid, i.e. the stationary distribution `g` that solves
 `0 = -∂(μ g) + 0.5 * ∂^2(σ^2 g) + δ (ψ - 1)`
 
 The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. If `σ` is not null at the boundary of the grids, the process is assumed to be reflected at the boundary.
