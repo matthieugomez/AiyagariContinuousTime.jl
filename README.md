@@ -8,7 +8,7 @@ The package solve the kolmogorov forward equation on a grid, i.e. the stationary
 
 `0 = -∂(μ g) + 0.5 * ∂^2(σ^2 g) + δ (ψ - 1)`
 
-The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. If `σ` is not null at the boundary of the grids, the process is assumed to be reflected at the boundary.
+The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. If `σ` is not null at the boundary of the grids, the process is assumed to be reflected.
 
 For instance, let us plot the stationary distribution of a brownian motion with negative drift (a pareto distribution):
 ```julia
