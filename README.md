@@ -10,7 +10,7 @@ Given a grid `x` and a set of vectors `μ, σ, δ, ψ`, the function returns `g`
 
 The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. If `σ` is not null at the boundary of the grids, the process is assumed to be reflected at the boundary.
 
-For instance, let us plot the stationary distribution of a brownian motion with negative drift (which is pareto):
+For instance, let us plot the stationary distribution of a brownian motion with negative drift (a pareto distribution):
 ```julia
 using HJBFiniteDifference
 x = logspace(-2, 5, 100)
