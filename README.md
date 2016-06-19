@@ -4,12 +4,13 @@ Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 ```
 
 # Kolmogorov Forward
-The package solve kolmogorov forward equation on a grid.
+The package solve the kolmogorov forward equation on a grid.
 Given a grid `x` and a set of vectors `μ, σ, δ, ψ`, the function returns `g` such that 
 `0 = -∂(μg) + 0.5 * ∂^2(σ^2g) + δ (ψ - 1)`
- The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. The process is assumed to be reflected at the boundaries of the grid.
 
-As an example, let's compute the stationary distribution of a brownian motion with negative drift:
+The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. The process is assumed to be reflected at the boundaries of the grid.
+
+For instance, we can check that the stationary distribution of a brownian motion with negative drift is power law:
 ```julia
 using HJBFiniteDifference
 x = logspace(-2, 3, 100)
