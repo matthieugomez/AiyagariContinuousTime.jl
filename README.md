@@ -18,6 +18,7 @@ x = logspace(-2, 3, 100)
 g = kolmogorovforward(x, μ, σ)
 using Gadfly
 plot(x = log(x), y = log(reverse(cumsum(reverse(g)))), Geom.line, Guide.xlabel("log-x"), Guide.ylabel("log-cdf"))
+![powerlaw](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/powerlaw.svg)
 ```
 
 
