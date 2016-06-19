@@ -8,7 +8,7 @@ The package solve the kolmogorov forward equation on a grid.
 Given a grid `x` and a set of vectors `μ, σ, δ, ψ`, the function returns `g` such that 
 `0 = -∂(μg) + 0.5 * ∂^2(σ^2g) + δ (ψ - 1)`
 
-The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. The process is assumed to be reflected at the boundaries of the grid.
+The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. If if `σX` is not null at the boundary of the grids, the process is assumed to be reflected.
 
 For instance, we can check that the stationary distribution of a brownian motion with negative drift is power law:
 ```julia
