@@ -1,4 +1,4 @@
-function computeA(x, μ, σ)
+function computeA(x::AbstractVector, μ::AbstractVector, σ::AbstractVector)
     n = length(x)
     Δxm = zeros(x)
     for i in 2:n
@@ -35,23 +35,22 @@ function computeA(x, μ, σ)
     return A
 end
 
-function kolmogorovforward(A)
+function kolmogorovforward(A::Matrix)
+    @show "ok2"
     n = size(A, 1)
     # numerical fix 
     for i in 1:n
         A[1, i] = - 1.0
     end
     b = vcat(1.0, zeros(n-1))
-    g = - A \ b
-    return g
+    - A \ b
 end
 
 
-function kolmogorovforward(A, δ, ψ)
+function kolmogorovforward(A::Matrix, δ::Real, ψ::AbstractVector)
     n = size(A, 1)
-    g = (δ * eye(n) - A) \ (δ * ψ)
-    return g
+    (δ * eye(n) - A) \ (δ * ψ)
 end
 
-kolmogorovforward(x, μ, σ) = kolmogorovforward(computeA(x, μ, σ))
-kolmogorovforward(x, μ, σ, args...) = kolmogorovforward(computeA(x, μ, σ)..., args...)
+
+kolmogorovforward(x::AbstractVector, μ::AbstractVector, σ::AbstractVector, args...) = kolmogorovforward(computeA(x, μ, σ), args...)

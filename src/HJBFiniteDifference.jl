@@ -33,6 +33,7 @@ include("bansalyaron/spectralmethod.jl")
 ##
 ##############################################################################
 export solve,
+kolmogorovforward,
 simulate,
 AiyagariProblem,
 AiyagariArrays,
