@@ -13,9 +13,9 @@ The function outputs a vector `g Δx`  which sums to one. The grid `x` is potent
 For instance, let us plot the stationary distribution of a brownian motion with negative drift (a pareto distribution):
 ```julia
 using HJBFiniteDifference
-x = logspace(-2, 5, 100)
-μ = -0.001 .* x
-σ = 0.2 .* x
+x = logspace(-4, 3, 100)
+μ = -0.01 .* x
+σ = 0.3 .* x
 g = kolmogorovforward(x, μ, σ)
 cumulativeg = cumsum(g)
 using Gadfly
