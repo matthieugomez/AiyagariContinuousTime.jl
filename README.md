@@ -10,11 +10,11 @@ The package solves the kolmogorov forward equation on a grid, i.e. the stationar
 
 The function outputs a vector `g Δx`  which sums to one. The grid `x` is potentially non-uniform. If `σ` is not null at the boundary of the grids, the process is assumed to be reflected.
 
-For instance, let us plot the stationary distribution of a brownian motion with negative drift (a pareto distribution):
+For instance, let us plot the stationary distribution of a brownian motion with null drift (a zipf distribution):
 ```julia
 using HJBFiniteDifference
 x = logspace(-4, 3, 100)
-μ = -0.01 .* x
+μ = zeros(x)
 σ = 0.3 .* x
 g = kolmogorovforward(x, μ, σ)
 cumulativeg = cumsum(g)

@@ -1,15 +1,15 @@
 function computeA(x::AbstractVector, μ::AbstractVector, σ::AbstractVector)
     n = length(x)
     # construct small Δx for finite difference scheme
-    Δxm = zeros(x)
+    Δxm = zeros(n)
     for i in 2:n
         Δxm[i] = x[i] - x[i-1]
     end
-    Δxp = zeros(x)
+    Δxp = zeros(n)
     for i in 1:(n-1)
         Δxp[i] = x[i+1] - x[i]
     end
-    Δx = zeros(x)
+    Δx = zeros(n)
     for i in 1:n
         Δx[i] = 0.5 * (Δxm[i] + Δxp[i])
     end
@@ -53,5 +53,5 @@ function kolmogorovforward(A::Matrix, δ::Real, ψ::AbstractVector)
     (δ * eye(n) - A) \ (δ * ψ)
 end
 
-
+kolmogorovforward(x::AbstractVector, μ::AbstractVector, σ::AbstractVector) = kolmogorovforward(computeA(x, μ, σ))
 kolmogorovforward(x::AbstractVector, μ::AbstractVector, σ::AbstractVector, args...) = kolmogorovforward(computeA(x, μ, σ), args...)
