@@ -71,10 +71,9 @@ solution = solve(byp, method = :spectral)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
 ```
-<div>
-    <a href="https://plot.ly/~mgmz/14/" target="_blank" title="Long Run Risk (BKY 2007)" style="display: block; text-align: center;"><img src="https://plot.ly/~mgmz/14.png" alt="Long Run Risk (BKY 2007)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="mgmz:14"  src="https://plot.ly/embed.js" async></script>
-</div>
+![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp_m.svg)
+![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp_vol.svg)
+
 
 # Bibliography
 Three excellent resources to learn about finite difference schemes and their applications to HJB equations:
