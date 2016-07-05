@@ -60,7 +60,7 @@ function plot(byp::BansalYaronProblem, solution, symbol::Symbol)
     # using Plotly
     # μ, σ = unique(df[:drift]), sqrt(unique(df[:volatility]))
     # trace = surface(x =μ, y = σ, z = reshape(exp(df[:wealthconsumption]), length(μ), length(σ)))
-    # layout = Plotly.Layout(title="Long Run Risk (BKY 2007)", autosize=false, scene = attr(xaxis = attr(title = "μ"), yaxis = attr(title = "σ"), zaxis = attr(title = "Wealth / Consumption")))
+    # layout = Plotly.Layout(title="Long Run Risk (BKY 2007)", autosize=false,  paper_bgcolor= "rgba(0,0,0,0)", plot_bgcolor = "rgba(0,0,0,0)", scene = attr(xaxis = attr(title = "μ"), yaxis = attr(title = "σ"), zaxis = attr(title = "Wealth / Consumption")))
     # myplot = Plotly.plot(trace, layout)
 
     if symbol == :s2
