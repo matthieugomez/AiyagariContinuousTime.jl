@@ -54,7 +54,7 @@ The package solves the PDE associated with the long run risk model of Bansal-Yar
 
 ```julia
 using HJBFiniteDifference, Gadfly
-byp = BansalYaronProblem(ρ = -log(0.9989), γ = 7.5, ψ = 1.5, νD = 0.0072, νμ = 0.038 * 0.0072, νσ = 0.00000283 / 0.0072^2, κμ = -log(0.975), κσ = -log(0.999))
+byp = BansalYaronProblem(μ = 0.018, νD = 0.025, κμ = 0.3, κσ = 0.012, νμ = 0.0114, νσ = 0.189,  ρ = 0.0132, γ = 7.5, ψ = 1.5)
 
 # Finite Differences (Nonlinear solver)
 solution = solve(byp, method = :nl)
@@ -71,9 +71,10 @@ solution = solve(byp, method = :spectral)
 plot(byp, solution, :s2)
 plot(byp, solution, :m)
 ```
-![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp_m.svg)
-![bansalyaron](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/byp_vol.svg)
-
+<div>
+    <a href="https://plot.ly/~mgmz/14/" target="_blank" title="Long Run Risk (BKY 2007)" style="display: block; text-align: center;"><img src="https://plot.ly/~mgmz/14.png" alt="Long Run Risk (BKY 2007)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="mgmz:14"  src="https://plot.ly/embed.js" async></script>
+</div>
 
 # Bibliography
 Three excellent resources to learn about finite difference schemes and their applications to HJB equations:

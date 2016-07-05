@@ -13,7 +13,7 @@ function computeA(x::AbstractVector, μ::AbstractVector, σ::AbstractVector)
     for i in 1:n
         Δx[i] = 0.5 * (Δxm[i] + Δxp[i])
     end
-    # construct matrix A
+    # construct matrix A. The key is that sum of each column = 0.0 and off diagonals are positive (singular M-matrix)
     A = zeros(n, n)
     for i in 1:length(x)
         # drift
@@ -38,13 +38,15 @@ function computeA(x::AbstractVector, μ::AbstractVector, σ::AbstractVector)
 end
 
 function kolmogorovforward(A::Matrix)
-    n = size(A, 1)
-    # numerical fix 
-    for i in 1:n
-        A[1, i] = - 1.0
+    # transformation is like adding sum = 1.0
+    n = size(A, 2)
+    for j in 1:n
+        A[1, j] = 1e-10
     end
-    b = vcat(1.0, zeros(n-1))
-    - A \ b
+    b = vcat(1e-10, zeros(n-1))
+    density = A \ b
+    # some values are -eps() < density < 0, — just set them to zero
+    density = abs(density) ./ sumabs(density)
 end
 
 
