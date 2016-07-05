@@ -83,6 +83,7 @@ function F!{T}(byfd::BansalYaronFDMethod, y::Vector{T}, ydot::Vector{T})
         else
             G∂2μ = (fy[μi+1, σi] + fy[μi-1, σi] - 2 * fy[μi, σi]) * byfd.invdμ^2
         end
+        # note G / byp.θ for method of line
         ydot[ij] = G / byp.θ * (byp.θ / G - byp.θ * byp.ρ + (1 - byp.γ) * (μs[μi] - 0.5 * byp.γ * byp.νD^2 * σs[σi])
                   + byp.θ  * (byp.κμ * (byp.μ - μs[μi])) * G∂μ / G 
                   + byp.θ  * (byp.κσ * (1.0 - σs[σi])) * G∂σ / G 
