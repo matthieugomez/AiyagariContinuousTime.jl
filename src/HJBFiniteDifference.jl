@@ -6,9 +6,11 @@ import DataFrames: DataFrame
 import Gadfly: plot, Geom
 import NLsolve: nlsolve
 import Distances: chebyshev
+using Gensys
 using ForwardDiff
 using ODE
 using CompEcon
+using Gensys
 
 ##############################################################################
 ##
@@ -18,7 +20,6 @@ using CompEcon
 include("kolmogorovforward/kolmogorov.jl")
 include("aiyagari/aiyagari.jl")
 include("aiyagari/dynamicaiyagari.jl")
-include("aiyagari/gensys.jl")
 
 
 include("bansalyaron/bansalyaronproblem.jl")

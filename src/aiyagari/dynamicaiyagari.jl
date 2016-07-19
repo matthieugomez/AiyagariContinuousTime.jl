@@ -19,19 +19,19 @@ end
 ##
 ##############################################################################
 
-function F(ap::AiyagariProblem, ρπ, σπ, V, g, K, r, w, π, Vdot, gdot, Kdot, rdot, wdot, πdot, Verrors, ηπ)
+function F(ap::AiyagariProblem, ρπ, σπ, V, g, K, r, w, π, Vpost, gpost, Kpost, rpost, wpost, πpost, Verrors, ηπ)
     newg = vcat(one(eltype(g)) - sum(g), g)
     as = AiyagariSolution(V, newg, K, r, w)
     aa = AiyagariArrays(ap, as)
-    HJBFiniteDifference.update_Au!(ap, aa, as)
-    HJBFiniteDifference.update_B!(ap, aa, as)
-    hjbResidual = aa.u + aa.A' * V - ap.ρ * V .+ Vdot .+ Verrors
-    newgIntermediate = aa.A * as.g
-    gResidual = gdot -  newgIntermediate[2:end]
+    update_Au!(ap, aa, as)
+    update_B!(ap, aa, as)
+    hjbResidual = aa.u + full(aa.A)' * V - ap.ρ * V .+ Vpost .- V .+ Verrors
+    newgIntermediate = full(aa.A) * as.g
+    gResidual = gpost .-  g .- newgIntermediate[2:end]
     KResidual = K - HJBFiniteDifference.sum_capital(ap.a, newg)
     rResidual = exp(π) * ap.α * K^(ap.α-1) - ap.δ - r
     wResidual = exp(π) * (1-ap.α) * K^ap.α  - w
-    πResidual = πdot + (1-ρπ) * π - σπ * ηπ
+    πResidual = πpost .- π .- (1-ρπ) * π - σπ * ηπ
     return hjbResidual, gResidual, KResidual, rResidual, wResidual, πResidual
 end
 
@@ -52,30 +52,30 @@ function F(ap, ρπ, σπ, x)
     start += 1
     π = x[start]
     start += 1
-    Vdot = x[start:(start + lV - 1)]
+    Vpost = x[start:(start + lV - 1)]
     start += lV
-    gdot = x[start:(start + lg - 1)]
+    gpost = x[start:(start + lg - 1)]
     start += lg
-    Kdot = x[start]
+    Kpost = x[start]
     start += 1
-    rdot = x[start]
+    rpost = x[start]
     start += 1
-    wdot = x[start]
+    wpost = x[start]
     start += 1
-    πdot = x[start]
+    πpost = x[start]
     start += 1
     Verrors = x[start:(start + lV - 1)]
     start += lV
     ηπ = x[start]
     @assert start == length(x)
-    return vcat(F(ap, ρπ, σπ, V, g, K, r, w, π, Vdot, gdot, Kdot, rdot, wdot, πdot, Verrors, ηπ)...)
+    return vcat(F(ap, ρπ, σπ, V, g, K, r, w, π, Vpost, gpost, Kpost, rpost, wpost, πpost, Verrors, ηπ)...)
 end
 
 function solve(ap::AiyagariProblem, ρπ, σπ)
     println("Compute Steady State")
     as = solve(ap, verbose = false)
     g = as.g[2:end]
-    x0 = vcat(as.V, g, as.K, as.r, as.w, ap.π, zeros(as.V), zeros(g), 0.0, 0.0, 0.0, 0.0, zeros(as.V), 0.0)
+    x0 = vcat(as.V, g, as.K, as.r, as.w, ap.π, deepcopy(as.V), deepcopy(g), as.K, as.r, as.w, ap.π, zeros(as.V), 0.0)
     ap.invΔ = 0.0
 
     # check function gives 0.0 at steady state 
@@ -83,7 +83,7 @@ function solve(ap::AiyagariProblem, ρπ, σπ)
 
     # compute jacobian around 0
     println("Compute Jacobian")
-    out = jacobian(x -> F(ap, ρπ, σπ, x), x0)
+    out = ForwardDiff.jacobian(x -> F(ap, ρπ, σπ, x), x0)
     # unpack derivatives
     Γ1 = - out[:, 1:(length(as.V) + length(g) + 4)]
     Γ0 = out[:, (length(as.V) + length(g) + 4 + 1):(2 * length(as.V) + 2 * length(g) + 2 * 4)]
@@ -93,7 +93,9 @@ function solve(ap::AiyagariProblem, ρπ, σπ)
     # solve system
     println("Solve Linearized Model")
     c = zeros(length(as.V) + length(g) + 4, 1)
-    G1, impact, existence, uniqueness = gensys(Γ0, Γ1, c, Ψ, Π)
+    G1, C, impact, fmat, fwt, ywt, gev, eu, loose = gensys(Γ0, Γ1, c, Ψ, Π)
+    existence = eu[1] == 1
+    uniquenes = eu[2] == 1
     return DynamicAiyagariSolution(as, G1, impact, existence, uniqueness)
 end
 

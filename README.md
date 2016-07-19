@@ -1,5 +1,6 @@
 # Install
 ```julia
+Pkg.clone("https://github.com/matthieugomez/Gensys.jl")
 Pkg.clone("https://github.com/matthieugomez/HJBFiniteDifference.jl")
 ```
 
@@ -23,6 +24,14 @@ plot(x = log(x), y = log(1 .- cumulativeg), Geom.line, Guide.xlabel("log-x"), Gu
 ```
 ![kolmogorov](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/kolmogorov.svg)
 
+
+To compute the stationary distribution of Ornstein-Uhlenbeck process
+```julia
+μ = collect(linspace(0.0, 0.04, 10))
+μμ = [0.3 * (0.02 - x) for x in μ]
+σμ = [0.01 for x in μ]
+kolmogorovforward(μ, μμ, σμ)
+```
 
 
 # Aiyagari
