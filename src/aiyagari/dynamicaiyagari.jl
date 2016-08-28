@@ -19,19 +19,19 @@ end
 ##
 ##############################################################################
 
-function F(ap::AiyagariProblem, ρπ, σπ, V, g, K, r, w, π, Vpost, gpost, Kpost, rpost, wpost, πpost, Verrors, ηπ)
+function F(ap::AiyagariProblem, ρπ, σπ, V, g, K, r, w, π, Vdot, gdot, Kdot, rdot, wdot, πdot, Verrors, ηπ)
     newg = vcat(one(eltype(g)) - sum(g), g)
     as = AiyagariSolution(V, newg, K, r, w)
     aa = AiyagariArrays(ap, as)
     update_Au!(ap, aa, as)
     update_B!(ap, aa, as)
-    hjbResidual = aa.u + full(aa.A)' * V - ap.ρ * V .+ Vpost .- V .+ Verrors
+    hjbResidual = aa.u + full(aa.A)' * V - ap.ρ * V .+ Vdot .+ Verrors
     newgIntermediate = full(aa.A) * as.g
-    gResidual = gpost .-  g .- newgIntermediate[2:end]
+    gResidual = gdot .- newgIntermediate[2:end]
     KResidual = K - HJBFiniteDifference.sum_capital(ap.a, newg)
     rResidual = exp(π) * ap.α * K^(ap.α-1) - ap.δ - r
     wResidual = exp(π) * (1-ap.α) * K^ap.α  - w
-    πResidual = πpost .- π .- (1-ρπ) * π - σπ * ηπ
+    πResidual = πdot .- (1-ρπ) * π - σπ * ηπ
     return hjbResidual, gResidual, KResidual, rResidual, wResidual, πResidual
 end
 
@@ -52,23 +52,23 @@ function F(ap, ρπ, σπ, x)
     start += 1
     π = x[start]
     start += 1
-    Vpost = x[start:(start + lV - 1)]
+    Vdot = x[start:(start + lV - 1)]
     start += lV
-    gpost = x[start:(start + lg - 1)]
+    gdot = x[start:(start + lg - 1)]
     start += lg
-    Kpost = x[start]
+    Kdot = x[start]
     start += 1
-    rpost = x[start]
+    rdot = x[start]
     start += 1
-    wpost = x[start]
+    wdot = x[start]
     start += 1
-    πpost = x[start]
+    πdot = x[start]
     start += 1
     Verrors = x[start:(start + lV - 1)]
     start += lV
     ηπ = x[start]
     @assert start == length(x)
-    return vcat(F(ap, ρπ, σπ, V, g, K, r, w, π, Vpost, gpost, Kpost, rpost, wpost, πpost, Verrors, ηπ)...)
+    return vcat(F(ap, ρπ, σπ, V, g, K, r, w, π, Vdot, gdot, Kdot, rdot, wdot, πdot, Verrors, ηπ)...)
 end
 
 function solve(ap::AiyagariProblem, ρπ, σπ)

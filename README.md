@@ -56,35 +56,6 @@ plot(x = time, y = r, Geom.line,  Guide.xlabel("Years"), Guide.ylabel("Percentag
 ![aiyagari](https://cdn.rawgit.com/matthieugomez/HJBFiniteDifference.jl/master/img/aiyagaridynamic.svg)
 
 
-# Bansal Yaron
-
-The package solves the PDE associated with the long run risk model of Bansal-Yaron (2004). This long run risk model is generally solved by log-linearization (i.e. assuming that the price dividend is log linear in state variables). Solving directly the PDE shows that the price-dividend actually displays substantial non linearity wrt volatility. The choice of parameters follows Bansal-Kiku-Yaron (2007). Explanations for the solution method are available [here](https://github.com/matthieugomez/HJBFiniteDifference.jl/blob/master/src/bansalyaron/bansalyaron.pdf).
-
-
-```julia
-using HJBFiniteDifference, Gadfly
-byp = BansalYaronProblem(μ = 0.018, νD = 0.025, κμ = 0.3, κσ = 0.012, νμ = 0.0114, νσ = 0.189,  ρ = 0.0132, γ = 7.5, ψ = 1.5)
-
-# Finite Differences (Nonlinear solver)
-solution = solve(byp, method = :nl)
-plot(byp, solution, :s2)
-plot(byp, solution, :m)
-
-# Finite Differences (ODE solver)
-solution = solve(byp, method = :ode)
-plot(byp, solution, :s2)
-plot(byp, solution, :m)
-
-# Spectral Method (Chebyshev polynomials)
-solution = solve(byp, method = :spectral)
-plot(byp, solution, :s2)
-plot(byp, solution, :m)
-```
-<div>
-    <a href="https://plot.ly/~mgmz/16/" target="_blank" title="Long Run Risk (BKY 2007)" style="display: block; text-align: center;"><img src="https://plot.ly/~mgmz/16.png" alt="Long Run Risk (BKY 2007)" style="max-width: 100%;width: 737px;"  width="737" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
-    <script data-plotly="mgmz:16"  src="https://plot.ly/embed.js" async></script>
-</div>
-
 # Bibliography
 Three excellent resources to learn about finite difference schemes and their applications to HJB equations:
 - [Numerical analysis of partial differential equations arising in finance and stochastic control](http://www.cmap.polytechnique.fr/%7Ebonnans/notes/edpfin/edpfin.html) by Frédéric Bonnans.
