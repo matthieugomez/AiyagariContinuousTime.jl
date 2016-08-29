@@ -1,15 +1,11 @@
 module HJBFiniteDifference
 
-import Distributions: Gamma, Normal
 import StatsBase: denserank
 import DataFrames: DataFrame
 import Gadfly: plot, Geom
-import NLsolve: nlsolve
 import Distances: chebyshev
 using Gensys
-using ForwardDiff
-using ODE
-using CompEcon
+using Calculus
 using Gensys
 
 ##############################################################################
@@ -20,11 +16,6 @@ using Gensys
 include("kolmogorovforward/kolmogorov.jl")
 include("aiyagari/aiyagari.jl")
 include("aiyagari/dynamicaiyagari.jl")
-
-
-include("bansalyaron/bansalyaronproblem.jl")
-include("bansalyaron/finitedifferences.jl")
-include("bansalyaron/spectralmethod.jl")
 
 
 

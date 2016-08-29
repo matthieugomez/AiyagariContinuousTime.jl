@@ -42,7 +42,7 @@ using HJBFiniteDifference
 ap = AiyagariProblem(π = 0.0);
 as = solve(ap)
 ```
-- The package solves a dynamic version of the Aiyagri model following [Ahn, Kaplan, Moll, Winberry](How to solve heterogeneous agent models in continuous time, with aggregate shocks)
+- The package solves a (untested) dynamic version of the Aiyagri model following [Ahn, Kaplan, Moll, Winberry](How to solve heterogeneous agent models in continuous time, with aggregate shocks)
 
 ```julia
 using HJBFiniteDifference, Gadfly
@@ -57,8 +57,4 @@ plot(x = time, y = r, Geom.line,  Guide.xlabel("Years"), Guide.ylabel("Percentag
 
 
 # Bibliography
-Three excellent resources to learn about finite difference schemes and their applications to HJB equations:
-- [Numerical analysis of partial differential equations arising in finance and stochastic control](http://www.cmap.polytechnique.fr/%7Ebonnans/notes/edpfin/edpfin.html) by Frédéric Bonnans.
-- [An introduction to Finite Difference methods for
-PDEs in Finance](https://www.fields.utoronto.ca/programs/scientific/09-10/finance/courses/tourin.pdf)  by Agnès Tourin 
--  [Heterogeneous Agent Models in Continuous Time](http://www.princeton.edu/~moll/HACTproject.htm) by Ben Moll.
+[Heterogeneous Agent Models in Continuous Time](http://www.princeton.edu/~moll/HACTproject.htm) by Ben Moll.
