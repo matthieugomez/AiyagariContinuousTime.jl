@@ -1,4 +1,4 @@
-module HJBFiniteDifference
+module AiyagariContinuousTime
 
 import StatsBase: denserank
 import DataFrames: DataFrame
