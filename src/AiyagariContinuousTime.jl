@@ -13,8 +13,8 @@ using Gensys
 ## Load files
 ##
 ##############################################################################
-include("aiyagari/aiyagari.jl")
-include("aiyagari/dynamicaiyagari.jl")
+include("aiyagari.jl")
+include("dynamicaiyagari.jl")
 
 
 
