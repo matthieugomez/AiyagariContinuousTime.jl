@@ -86,9 +86,9 @@ end
 ##############################################################################
 
 type AiyagariArrays{T}
-    C::Base.SparseMatrix.SparseMatrixCSC{T, Int} 
-    B::Base.SparseMatrix.SparseMatrixCSC{T, Int}   
-    A::Base.SparseMatrix.SparseMatrixCSC{T, Int}   
+    C::SparseMatrixCSC{T, Int} 
+    B::SparseMatrixCSC{T, Int}   
+    A::SparseMatrixCSC{T, Int}   
     b::Vector{T}
     u::Vector{T}
 end

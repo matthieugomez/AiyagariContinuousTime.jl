@@ -13,7 +13,6 @@ using Gensys
 ## Load files
 ##
 ##############################################################################
-include("kolmogorovforward/kolmogorov.jl")
 include("aiyagari/aiyagari.jl")
 include("aiyagari/dynamicaiyagari.jl")
 
@@ -25,7 +24,6 @@ include("aiyagari/dynamicaiyagari.jl")
 ##
 ##############################################################################
 export solve,
-kolmogorovforward,
 simulate,
 AiyagariProblem,
 AiyagariArrays,
