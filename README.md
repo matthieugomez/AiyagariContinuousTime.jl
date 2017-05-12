@@ -1,8 +1,4 @@
-# Install
-```julia
-Pkg.clone("https://github.com/QuantEcon/Gensys.jl")
-Pkg.clone("https://github.com/matthieugomez/AiyagariContinuousTime.jl")
-```
+
 
 - The package solves the Aiyagari model following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
 	```julia
@@ -24,6 +20,11 @@ Pkg.clone("https://github.com/matthieugomez/AiyagariContinuousTime.jl")
 	```
 	![aiyagari](https://cdn.rawgit.com/matthieugomez/AiyagariContinuousTime.jl/master/img/aiyagaridynamic.svg)
 
+- To install, 
+	```julia
+	Pkg.clone("https://github.com/QuantEcon/Gensys.jl")
+	Pkg.clone("https://github.com/matthieugomez/AiyagariContinuousTime.jl")
+	```
 
 # Bibliography
 [Heterogeneous Agent Models in Continuous Time](http://www.princeton.edu/~moll/HACTproject.htm) by Ben Moll.
