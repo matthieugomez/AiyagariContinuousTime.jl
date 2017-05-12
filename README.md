@@ -3,7 +3,6 @@
 - The package solves the Aiyagari model following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
 	```julia
 	using AiyagariContinuousTime
-	# solve a static equilibrium
 	ap = AiyagariProblem(π = 0.0);
 	as = solve(ap)
 	```

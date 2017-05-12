@@ -22,12 +22,12 @@ function F(ap::AiyagariProblem, ρπ, σπ, V, g, K, r, w, π, Vpost, gpost, Kpo
     newg = vcat(one(eltype(g)) - sum(g), g)
     as = AiyagariSolution(V, newg, K, r, w)
     aa = AiyagariArrays(ap, as)
-    HJBFiniteDifference.update_Au!(ap, aa, as)
-    HJBFiniteDifference.update_B!(ap, aa, as)
+    update_Au!(ap, aa, as)
+    update_B!(ap, aa, as)
     hjbResidual = aa.u - aa.B' * V .+ Vpost .- V .- Verrors
     newgIntermediate = aa.A * as.g
     gResidual = gpost .- g -  newgIntermediate[2:end]
-    KResidual = K - HJBFiniteDifference.sum_capital(ap.a, newg)
+    KResidual = K - sum_capital(ap.a, newg)
     rResidual = exp(π) * ap.α * K^(ap.α-1) - ap.δ - r
     wResidual = exp(π) * (1-ap.α) * K^ap.α  - w
     πResidual = πpost - π - (-(1-ρπ) * π + σπ * ηπ)
@@ -83,6 +83,7 @@ function solve(ap::AiyagariProblem, ρπ, σπ)
     # compute jacobian around 0
     println("Compute Jacobian")
     out = Calculus.jacobian(x -> F(ap, ρπ, σπ, x))(x0)
+    
     # unpack derivatives
     Γ1 = - out[:, 1:(length(as.V) + length(g) + 4)]
     Γ0 = out[:, (length(as.V) + length(g) + 4 + 1):(2 * length(as.V) + 2 * length(g) + 2 * 4)]

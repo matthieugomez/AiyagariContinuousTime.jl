@@ -31,7 +31,7 @@ function AiyagariProblem(;
                          σ2::Float64 = (0.10)^2,  
                          θ::Float64 = 0.3,
                          zmean::Float64 = 1.0,      
-                         zn::Int = 20, 
+                         zn::Int = 10, 
                          zmin::Float64 = 0.5, 
                          zmax::Float64 = 1.5, 
                          amin::Float64 = -1.0, 
@@ -117,7 +117,6 @@ function AiyagariArrays{T}(ap::AiyagariProblem, as::AiyagariSolution{T})
         ij += 1
         krange = nzrange(C, ij)
         rows = Crows[krange]
-
         if zi > 1
             current =  0.5 * σ2 * invdz^2
             index = searchsortedfirst(rows, ij - an)
@@ -125,7 +124,6 @@ function AiyagariArrays{T}(ap::AiyagariProblem, as::AiyagariSolution{T})
             index = searchsortedfirst(rows, ij)
             Cvals[krange[index]] -= current
         end    
-        
         if zi < zn
             current = θ * (zmean - z[zi]) * invdz + 0.5 * σ2 * invdz^2
             index = searchsortedfirst(rows, ij + an)
@@ -279,7 +277,6 @@ function solve_fp!(ap::AiyagariProblem, aa::AiyagariArrays, as::AiyagariSolution
         end
     end
     Avals[1] = one(Float64)
-    
     # solve system Ag = b
     as.g = A \ aa.b
     scale!(as.g, 1/sum(as.g))
