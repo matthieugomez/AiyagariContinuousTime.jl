@@ -4,8 +4,6 @@ Pkg.clone("https://github.com/QuantEcon/Gensys.jl")
 Pkg.clone("https://github.com/matthieugomez/AiyagariContinuousTime.jl")
 ```
 
-
-# Aiyagari
 - The package solves the Aiyagari model following Achdou, Han, Lasry, Lions and Moll (2015) "Heterogeneous Agent Models in Continuous Time"
 	```julia
 	using AiyagariContinuousTime
