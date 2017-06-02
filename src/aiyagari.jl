@@ -22,24 +22,7 @@ type AiyagariProblem
     invΔ::Float64            # 1/δ in HznB algorithm
 end
 
-function AiyagariProblem(;
-                         π::Float64 = 0.0, 
-                         γ::Float64 = 2.0, 
-                         α::Float64 = 0.35, 
-                         δ::Float64 = 0.1, 
-                         ρ::Float64 = 0.05, 
-                         σ2::Float64 = (0.10)^2,  
-                         θ::Float64 = 0.3,
-                         zmean::Float64 = 1.0,      
-                         zn::Int = 10, 
-                         zmin::Float64 = 0.5, 
-                         zmax::Float64 = 1.5, 
-                         amin::Float64 = -1.0, 
-                         amax::Float64 = 50.0, 
-                         an::Int = 50, 
-                         invΔ::Float64 = 1e-3
-                         )
-
+function AiyagariProblem(;π::Float64 = 0.0, γ::Float64 = 2.0, α::Float64 = 0.35, δ::Float64 = 0.1, ρ::Float64 = 0.05, σ2::Float64 = (0.10)^2,  θ::Float64 = 0.3,zmean::Float64 = 1.0, zn::Int = 10, zmin::Float64 = 0.5, zmax::Float64 = 1.5, amin::Float64 = -1.0, amax::Float64 = 50.0, an::Int = 50, invΔ::Float64 = 1e-3)
     a = collect(linspace(amin,amax,an))  
     z = collect(linspace(zmin,zmax,zn))  
     AiyagariProblem(π, γ, α, δ, ρ, σ2, θ, zmean, z, a, invΔ)
@@ -132,26 +115,29 @@ function  update_Au!(ap::AiyagariProblem, aa::AiyagariArrays, as::AiyagariSoluti
     ij = zero(Int)
     @inbounds for zi in 1:zn, ai in 1:an
         ij += 1
-        if  θ * (zmean - z[zi]) >= 0
-            A[ai + an * (zi - 1), ij] -= θ * (zmean - z[zi]) * invdz
-            A[ai + an * (min(zi + 1, zn) - 1), ij] += θ * (zmean - z[zi]) * invdz
+        # deal with changes in z
+        μz = θ * (zmean - z[zi])
+        if  μz >= 0
+            A[ai + an * (zi - 1), ij] -= μz * invdz
+            A[ai + an * (min(zi + 1, zn) - 1), ij] += μz * invdz
         else
-            A[ai + an * (zi - 1), ij] += θ * (zmean - z[zi]) * invdz
-            A[ai + an * (max(zi - 1, 1) - 1), ij] -= θ * (zmean - z[zi]) * invdz
+            A[ai + an * (max(zi - 1, 1) - 1), ij] -= μz * invdz
+            A[ai + an * (zi - 1), ij] += μz * invdz
         end
         A[ai + an * (max(zi - 1, 1) - 1), ij] += 0.5 * σ2 * invdz^2
         A[ai + an * (min(zi + 1, zn) - 1), ij] += 0.5 * σ2 * invdz^2
         A[ai + an * (zi - 1), ij] -= 2 * 0.5 * σ2 * invdz^2
+        # deal with changes in a
         if ai < an
             ∂V = (as.V[ij+1] - as.V[ij]) * invda
         else
             # state constraint boundary condition
             ∂V = (as.w * z[zi] + as.r * a[end])^(-γ)
         end
-        saving = as.w * z[zi] + as.r * a[ai] - ∂V^(-invγ)
-        if saving > 0 # case of positive drift
-            A[ai + an * (zi - 1), ij] -= saving * invda 
-            A[min(ai + 1, an) + an * (zi - 1), ij] += saving * invda 
+        μa = as.w * z[zi] + as.r * a[ai] - ∂V^(-invγ)
+        if μa > 0 # case of positive drift
+            A[ai + an * (zi - 1), ij] -= μa * invda 
+            A[min(ai + 1, an) + an * (zi - 1), ij] += μa * invda 
         else
             if ai > 1
                 ∂V = (as.V[ij] - as.V[ij-1]) * invda
@@ -159,15 +145,13 @@ function  update_Au!(ap::AiyagariProblem, aa::AiyagariArrays, as::AiyagariSoluti
                 # state constraint boundary condition
                 ∂V =  (as.w * z[zi] + as.r * a[1])^(-γ) 
             end
-            saving = as.w * z[zi] + as.r * a[ai] - ∂V^(-invγ)
-            if saving < 0 # case of negative drift
-                A[max(ai - 1, 1) + an * (zi - 1), ij] -= saving * invda 
-                A[ai + an * (zi - 1), ij] += saving * invda 
+            μa = as.w * z[zi] + as.r * a[ai] - ∂V^(-invγ)
+            if μa < 0 # case of negative drift
+                A[max(ai - 1, 1) + an * (zi - 1), ij] -= μa * invda 
+                A[ai + an * (zi - 1), ij] += μa * invda 
             else
                 ∂V = (as.w * z[zi] + as.r * a[ai])^(-γ)
             end
-
-
         end
         # update u
         u[ij] = inv1γ * ∂V^(1-invγ) + invΔ * as.V[ij]
