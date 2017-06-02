@@ -67,7 +67,7 @@ function AiyagariSolution{T}(ap::AiyagariProblem; K::T = 3.8)
     zn = length(z)
     r = exp(π) * α * K^(α-1) - δ 
     w = exp(π) * (1-α) * K^α   
-    V = Array(T, an*zn)
+    V = Array{T}(an*zn)
     ij = zero(Int)
     for zi in 1:zn, ai in 1:an
         ij += 1
@@ -75,7 +75,7 @@ function AiyagariSolution{T}(ap::AiyagariProblem; K::T = 3.8)
     end
 
     # storage arrays
-    g = Array(T, an*zn)
+    g = Array{T}(an*zn)
     AiyagariSolution(V, g, K, r, w)
 end
 
@@ -86,7 +86,6 @@ end
 ##############################################################################
 
 type AiyagariArrays{T}
-    C::SparseMatrixCSC{T, Int} 
     B::SparseMatrixCSC{T, Int}   
     A::SparseMatrixCSC{T, Int}   
     b::Vector{T}
@@ -94,12 +93,10 @@ type AiyagariArrays{T}
 end
 
 function AiyagariArrays{T}(ap::AiyagariProblem, as::AiyagariSolution{T})
-    π = ap.π ; α = ap.α ; δ = ap.δ ; z = ap.z ; a = ap.a ; γ = ap.γ ; ρ = ap.ρ; σ2 = ap.σ2 ; θ = ap.θ ; zmean = ap.zmean
-    invdz = 1/(z[2] - z[1])
+    π = ap.π ; α = ap.α ; δ = ap.δ ; z = ap.z ; a = ap.a ; γ = ap.γ ; ρ = ap.ρ; σ2 = ap.σ2 ; θ = ap.θ ; zmean = ap.zmean ; invΔ = ap.invΔ
     invda = 1/(a[2] - a[1])
     an = length(a)
     zn = length(z)
-
     # create 3 sparse matrices of the right form filled with zeros
     A = spdiagm(
         (ones(T, an*zn), ones(T, an*zn-1), ones(T, an*zn-1), ones(T, (zn-1)*an), ones(T, (zn-1)*an)),
@@ -107,39 +104,11 @@ function AiyagariArrays{T}(ap::AiyagariProblem, as::AiyagariSolution{T})
     )
     fill!(nonzeros(A), zero(T))
     B = deepcopy(A)
-    C = deepcopy(A)
-
-    # fill up matrix C
-    Cvals = nonzeros(C) 
-    Crows = rowvals(C) 
-    ij = zero(Int)
-    @inbounds for zi in 1:zn, ai in 1:an
-        ij += 1
-        krange = nzrange(C, ij)
-        rows = Crows[krange]
-        if zi > 1
-            current =  0.5 * σ2 * invdz^2
-            index = searchsortedfirst(rows, ij - an)
-            Cvals[krange[index]] += current
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
-        end    
-        if zi < zn
-            current = θ * (zmean - z[zi]) * invdz + 0.5 * σ2 * invdz^2
-            index = searchsortedfirst(rows, ij + an)
-            Cvals[krange[index]] += current
-            index = searchsortedfirst(rows, ij)
-            Cvals[krange[index]] -= current
-        end
-    end
-
     # b such that Ag = b in plank
     b = fill(zero(T), an*zn)
     b[1] = .1
-
     u = similar(b)
-
-    AiyagariArrays(C, B, A, b, u)
+    AiyagariArrays(B, A, b, u)
 end
 
 
@@ -151,21 +120,28 @@ end
 
     # update A and u
 function  update_Au!(ap::AiyagariProblem, aa::AiyagariArrays, as::AiyagariSolution)
-    γ = ap.γ  ;  a = ap.a ; z = ap.z ; invΔ = ap.invΔ ;  ρ = ap.ρ ;     z = ap.z ; a = ap.a ;
-    C = aa.C  ; A = aa.A ; u = aa.u ; B = aa.B ;
+    π = ap.π ; α = ap.α ; δ = ap.δ ; z = ap.z ; a = ap.a ; γ = ap.γ ; ρ = ap.ρ; σ2 = ap.σ2 ; θ = ap.θ ; zmean = ap.zmean ; invΔ = ap.invΔ
+    A = aa.A ; u = aa.u ; B = aa.B ;
     an = length(a)
     zn = length(z)
     invda = (an-1)/(a[end]-a[1])
+    invdz = 1/(z[2] - z[1])
     invγ = 1/γ
     inv1γ = 1.0/(1.0-γ)
-    Cvals = nonzeros(C)
-    Avals = nonzeros(A)
-    copy!(Avals, Cvals)
+    fill!(nonzeros(A), 0.0)
     ij = zero(Int)
     @inbounds for zi in 1:zn, ai in 1:an
         ij += 1
-        krange = nzrange(A, ij)
-        rows = rowvals(A)[krange]
+        if  θ * (zmean - z[zi]) >= 0
+            A[ai + an * (zi - 1), ij] -= θ * (zmean - z[zi]) * invdz
+            A[ai + an * (min(zi + 1, zn) - 1), ij] += θ * (zmean - z[zi]) * invdz
+        else
+            A[ai + an * (zi - 1), ij] += θ * (zmean - z[zi]) * invdz
+            A[ai + an * (max(zi - 1, 1) - 1), ij] -= θ * (zmean - z[zi]) * invdz
+        end
+        A[ai + an * (max(zi - 1, 1) - 1), ij] += 0.5 * σ2 * invdz^2
+        A[ai + an * (min(zi + 1, zn) - 1), ij] += 0.5 * σ2 * invdz^2
+        A[ai + an * (zi - 1), ij] -= 2 * 0.5 * σ2 * invdz^2
         if ai < an
             ∂V = (as.V[ij+1] - as.V[ij]) * invda
         else
@@ -174,13 +150,8 @@ function  update_Au!(ap::AiyagariProblem, aa::AiyagariArrays, as::AiyagariSoluti
         end
         saving = as.w * z[zi] + as.r * a[ai] - ∂V^(-invγ)
         if saving > 0 # case of positive drift
-            if ai < an
-                current = saving * invda 
-                index = searchsortedfirst(rows, ij)
-                Avals[krange[index]] -= current
-                index = searchsortedfirst(rows, ij + 1)
-                Avals[krange[index]] += current
-            end
+            A[ai + an * (zi - 1), ij] -= saving * invda 
+            A[min(ai + 1, an) + an * (zi - 1), ij] += saving * invda 
         else
             if ai > 1
                 ∂V = (as.V[ij] - as.V[ij-1]) * invda
@@ -190,18 +161,14 @@ function  update_Au!(ap::AiyagariProblem, aa::AiyagariArrays, as::AiyagariSoluti
             end
             saving = as.w * z[zi] + as.r * a[ai] - ∂V^(-invγ)
             if saving < 0 # case of negative drift
-                if ai > 1
-                    current = saving * invda 
-                    index = searchsortedfirst(rows, ij - 1)
-                    Avals[krange[index]] -= current
-                    index = searchsortedfirst(rows, ij)
-                    Avals[krange[index]] += current
-                end
+                A[max(ai - 1, 1) + an * (zi - 1), ij] -= saving * invda 
+                A[ai + an * (zi - 1), ij] += saving * invda 
             else
                 ∂V = (as.w * z[zi] + as.r * a[ai])^(-γ)
             end
-        end
 
+
+        end
         # update u
         u[ij] = inv1γ * ∂V^(1-invγ) + invΔ * as.V[ij]
     end
@@ -209,24 +176,10 @@ end
 
 function update_B!(ap::AiyagariProblem, aa::AiyagariArrays, as::AiyagariSolution)
     γ = ap.γ  ;  a = ap.a ; z = ap.z ; invΔ = ap.invΔ ;  ρ = ap.ρ ;     z = ap.z ; a = ap.a ;
-    C = aa.C  ; A = aa.A ; u = aa.u ; B = aa.B ;
+    A = aa.A ; u = aa.u ; B = aa.B ;
     an = length(a)
     zn = length(z)
-    Bvals = nonzeros(B) 
-    Brows = rowvals(B)
-    Avals = nonzeros(A)
-    ij = zero(Int)
-    @inbounds for zi in 1:zn, ai in 1:an
-        ij += 1
-        for k in nzrange(B, ij)
-            # loop over elements in the column ij
-            row = Brows[k]
-            Bvals[k] = - Avals[k]
-            if row == ij
-                Bvals[k] += invΔ + ρ
-            end
-        end
-    end
+    B .= (invΔ + ρ) .* eye(B) .- A
 end
 
 function solve_hjb!(ap::AiyagariProblem, 
